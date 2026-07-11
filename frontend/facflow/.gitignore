@@ -1,0 +1,46 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencies
+node_modules/
+bower_components/
+
+# Build
+dist/
+dist-ssr/
+.vite/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+.DS_*
+Thumbs.db
+Desktop.ini
+
+# Design files
+*.sublime*
+psd
+thumb
+sketch
+
+# Backup
+**/*.backup.*
+**/*.back.*
