@@ -30,6 +30,7 @@ module.exports = function () {
   require("../src/routes/dashboardRoute")(app);
   require("../src/routes/planRoute")(app);
   require("../src/routes/productionRoute")(app);
+  require("../src/routes/equipmentRoute")(app);
 
   return app;
 };
