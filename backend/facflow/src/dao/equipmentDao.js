@@ -10,12 +10,7 @@ exports.selectEquipmentSummary = async function (connection) {
   const Params = [];
 
   const [rows] = await connection.query(Query, Params);
-  return {
-    totalEquipment: rows[0].totalEquipment,
-    runningEquipment: rows[0].runningEquipment,
-    idleEquipment: rows[0].idleEquipment,
-    stoppedEquipment: rows[0].stoppedEquipment
-  };
+  return rows;
 };
 
 exports.selectEquipmentList = async function (connection) {
