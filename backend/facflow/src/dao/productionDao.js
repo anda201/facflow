@@ -21,6 +21,7 @@ exports.selectProductionSummary = async function (connection, productionDate) {
     return rows;
 };
 
+
 exports.selectProductionList = async function (connection, productionDate) {
     const Query = 
         `SELECT 
@@ -45,4 +46,42 @@ exports.selectProductionList = async function (connection, productionDate) {
 
     const [rows] = await connection.query(Query, Params);
     return rows;
+};
+
+
+exports.insertProduction = async function (connection, planId, equipmentId) {
+    const Query = 
+        `INSERT INTO Production (planId, equipmentId, startTime) VALUES (?, ?, NOW());`;
+    const Params = [planId, equipmentId];
+
+    const [result] = await connection.query(Query, Params);
+    return result;
+};
+
+exports.selectProductionById = async function (connection, productionId) {
+    const Query = 
+        `SELECT 
+            p.productionId,
+            p.planId,
+            p.equipmentId,
+            pp.targetQty
+        FROM Production p
+        INNER JOIN ProductPlan pp ON p.planId = pp.planId
+        WHERE p.productionId = ?;`;
+    const Params = [productionId];
+
+    // console.log(Query, Params);
+    const [rows] = await connection.query(Query, Params);
+    return rows[0];
+};
+
+exports.endProduction = async function (connection, productionId, goodQty, defectQty) {
+    const Query = 
+        `UPDATE Production 
+        SET endTime = NOW(), goodQty = ?, defectQty = ? 
+        WHERE productionId = ?;`;
+    const Params = [goodQty, defectQty, productionId];
+
+    const [result] = await connection.query(Query, Params);
+    return result;
 };

@@ -5,6 +5,7 @@ module.exports = function (app) {
     // app.HTTP메서드(uri, 컨트롤러 콜백함수)
     app.get("/plan", plan.getPlan);
     app.post("/plan", plan.createPlan);
-    app.patch("/plan/:planId", plan.updatePlan);
+    app.patch("/plan/:planId", plan.updatePlanStatus);
+    app.patch("/plan/:planId/start", plan.startPlan);
   };
   

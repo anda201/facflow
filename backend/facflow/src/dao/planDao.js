@@ -51,7 +51,7 @@ exports.insertPlan = async function (connection, productId, planDate, targetQty)
 };
 
 
-exports.updatePlan = async function (connection, planId, status) {
+exports.updatePlanStatus = async function (connection, planId, status) {
     const Query = 
     `UPDATE ProductPlan SET status = ? WHERE planId = ?;`;
     const Params = [status, planId];
