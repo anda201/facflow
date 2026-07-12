@@ -1,6 +1,6 @@
 const { logger } = require("../../config/winston");
 
-const dashboardService = require("../services/dashboardServices");
+const dashboardService = require("../services/dashboardService");
 
 // 예시 코드
 exports.getDashboard = async function (req, res) {
