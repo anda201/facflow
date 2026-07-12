@@ -27,6 +27,7 @@ module.exports = function () {
 
   //직접 구현하는 모듈
   require("../src/routes/indexRoute")(app);
+  require("../src/routes/dashboardRoute")(app);
 
   return app;
 };
