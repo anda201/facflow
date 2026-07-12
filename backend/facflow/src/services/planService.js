@@ -24,8 +24,8 @@ exports.getPlan = async function (planDate) {
   }
 
   try {
-    const summary = await planDao.selectPlanSummary(connection, date);
-    const plans = await planDao.selectPlanList(connection, date);
+    const summary = await planDao.selectPlanSummary(connection, planDate);
+    const plans = await planDao.selectPlanList(connection, planDate);
 
     return {
       summary: summary[0],

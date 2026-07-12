@@ -29,6 +29,7 @@ module.exports = function () {
   require("../src/routes/indexRoute")(app);
   require("../src/routes/dashboardRoute")(app);
   require("../src/routes/planRoute")(app);
+  require("../src/routes/productionRoute")(app);
 
   return app;
 };
