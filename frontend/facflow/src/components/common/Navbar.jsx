@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-transparent">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container">
-                <Link className="navbar-brand" to="/">
+                <Link className="navbar-brand" to="/dashboard">
                     <img src="/facflow_icon.png" alt="FacFlow" height="30" className="me-2" />
                     <span className="fw-bold">FacFlow</span>
                 </Link>
@@ -15,6 +15,9 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav">
                         <li className="nav-item">
+                            <Link className="nav-link" to="/dashboard">생산현황</Link>
+                        </li>
+                        <li className="nav-item">
                             <Link className="nav-link" to="/plans">생산계획</Link>
                         </li>
                         <li className="nav-item">
@@ -22,9 +25,6 @@ const Navbar = () => {
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link" to="/equipments">설비관리</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/defects">불량관리</Link>
                         </li>
                     </ul>
                 </div>

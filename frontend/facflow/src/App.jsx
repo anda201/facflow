@@ -4,8 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Plans from './pages/Plans'
 import Productions from './pages/Productions'
 import Equipments from './pages/Equipments'
-import Defects from './pages/Defects'
-import Navbar from './components/common/Navbar'
+import { Navbar } from './components/common'
 
 function App() {
   return (
@@ -14,11 +13,10 @@ function App() {
       <section id="center" className='flex-1'>
         <div className="container">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/productions" element={<Productions />} />
             <Route path="/equipments" element={<Equipments />} />
-            <Route path="/defects" element={<Defects />} />
           </Routes>
         </div>
       </section>

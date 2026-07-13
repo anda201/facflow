@@ -1,3 +1,27 @@
 .layout {
-    background: var(--bg-color);
+    background: #14171C;
+}
+
+/* Dashboard */
+.dashboard {
+    background: #14171C;
+    color: #EDEFF2;
+    min-height: 100%;
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    padding: 28px;
+    box-sizing: border-box;
+}
+
+.dashboard-kpi-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.dashboard-charts-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 14px;
 }
