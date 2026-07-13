@@ -40,7 +40,7 @@ exports.selectProductionList = async function (connection, productionDate) {
         INNER JOIN Product prod ON pp.productId = prod.productId
         INNER JOIN Equipment eq ON p.equipmentId = eq.equipmentId
         WHERE pp.planDate = ?
-        AND pp.status = 'DONE'
+        AND (pp.status = 'DONE' OR pp.status = 'RUN')
         ORDER BY p.startTime DESC;`;
     const Params = [productionDate];
 

@@ -4,15 +4,10 @@ const { logger } = require("../../config/winston");
 const planDao = require("../dao/planDao");
 const equipmentDao = require("../dao/equipmentDao");
 const productionDao = require("../dao/productionDao");
-
-const getTodayDate = () => {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60000;
-  return new Date(now - offset).toISOString().slice(0, 10);
-};
+const { today } = require("../utils/date")
 
 exports.getPlan = async function (planDate) {
-  const date = planDate || getTodayDate();
+  const date = planDate || today();
 
   let connection;
 
@@ -26,8 +21,8 @@ exports.getPlan = async function (planDate) {
   }
 
   try {
-    const summary = await planDao.selectPlanSummary(connection, planDate);
-    const plans = await planDao.selectPlanList(connection, planDate);
+    const summary = await planDao.selectPlanSummary(connection, date);
+    const plans = await planDao.selectPlanList(connection, date);
 
     return {
       summary: summary[0],

@@ -1,4 +1,5 @@
 const { pool } = require("../../config/database");
+const { today } = require("../utils/date")
 
 // - selectTodayProduction() : 오늘자 생산량 총합
 // - selectAchievementRate() : 달성률(오늘자 생산량 / 오늘자 목표량)
@@ -8,15 +9,15 @@ const { pool } = require("../../config/database");
 // - selectProductChart() : 주간 제품별 생산량 차트
 // - selectWeeklyChart() : 주간 날짜별 생산량 추이 차트
 
-const DATE_SUB = `DATE_SUB(CURDATE(), INTERVAL 1 DAY)`; // 어제 날짜
+const DATE_SUB = today(); // 어제 날짜
 
 exports.selectTodayProduction = async function (connection) {
   const Query = 
     `SELECT IFNULL(SUM(p.goodQty), 0) AS todayProduction 
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
-    WHERE pp.planDate = ${DATE_SUB};`;
-  const Params = [];
+    WHERE pp.planDate = ?;`;
+  const Params = [DATE_SUB];
 
   const [rows] = await connection.query(Query, Params);
   console.log(rows[0].todayProduction);
@@ -34,9 +35,9 @@ exports.selectAchievementRate = async function (connection) {
     FROM Production p
     INNER JOIN ProductPlan pp 
     ON p.planId = pp.planId
-    WHERE pp.planDate = ${DATE_SUB};`;
+    WHERE pp.planDate = ?;`;
 
-  const Params = [];
+  const Params = [DATE_SUB];
 
   const [rows] = await connection.query(Query, Params);
   return rows[0].achievementRate;
@@ -48,8 +49,8 @@ exports.selectTodayDefect = async function (connection) {
     `SELECT IFNULL(SUM(p.defectQty), 0) AS todayDefect 
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
-    WHERE pp.planDate = ${DATE_SUB};`;
-  const Params = [];
+    WHERE pp.planDate = ?;`;
+  const Params = [DATE_SUB];
 
   const [rows] = await connection.query(Query, Params);
 
@@ -61,8 +62,8 @@ exports.selectTodayDefectRate = async function (connection) {
     `SELECT IFNULL(SUM(p.defectQty) / NULLIF(SUM(p.goodQty),0) * 100, 0) AS todayDefectRate 
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
-    WHERE pp.planDate = ${DATE_SUB};`;
-  const Params = [];
+    WHERE pp.planDate = ?;`;
+  const Params = [DATE_SUB];
 
   const [rows] = await connection.query(Query, Params);
   return rows[0].todayDefectRate;

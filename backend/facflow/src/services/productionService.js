@@ -5,15 +5,10 @@ const productionDao = require("../dao/productionDao");
 const equipmentDao = require("../dao/equipmentDao");
 const planDao = require("../dao/planDao");
 const { generateProductionQty } = require("../utils/productionQtyGenerator");
-
-const getTodayDate = () => {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60000;
-  return new Date(now - offset).toISOString().slice(0, 10);
-};
+const { today } = require("../utils/date")
 
 exports.getProduction = async function (productionDate) {
-  const date = productionDate || getTodayDate();
+  const date = productionDate || today();
 
   let connection;
 
