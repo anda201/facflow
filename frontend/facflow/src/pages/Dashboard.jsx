@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { getDashboard } from "../api";
 import { AchievementGaugeCard, Kpi, WeeklyProductionChart, ProductRanking} from "../components/dashboard";
-import { PageHeader, AlertBanner } from "../components/common";
+import { PageHeader, HeaderBadge, AlertBanner } from "../components/common";
 import { fmt, fmtPct } from "../utils/format";
+import { Factory } from "lucide-react";
+import { COLORS } from "../constants/colors";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -42,8 +44,13 @@ export default function Dashboard() {
       <PageHeader
         title="생산 현황 대시보드"
         subtitle="LINE MONITOR · 2026-07-13 (MON) · 실시간"
-        showAlert={showAlert}
-      />
+        icon={Factory}
+      >
+        <HeaderBadge
+          color={showAlert ? COLORS.red : COLORS.green}
+          label={showAlert ? "라인 점검 필요" : "정상 가동"}
+        />
+      </PageHeader>
 
       <AlertBanner
         show={showAlert}

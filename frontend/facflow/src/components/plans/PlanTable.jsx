@@ -3,7 +3,8 @@
 
 import React from "react";
 import { ChevronRight } from "lucide-react";
-import StatusBadge from "./StatusBadge";
+import { StatusBadge } from "../common";
+import { STATUS_META } from "../../constants/planMeta";
 import { COLORS } from "../../constants/colors";
 import { fmt, toKstDateInputValue } from "../../utils/format";
 
@@ -128,7 +129,7 @@ function PlanTable({ plans, dateTargetTotal, flashId, onRowClick }) {
                   {fmt(p.targetQty)}
                 </td>
                 <td style={{ padding: "12px 18px" }}>
-                  <StatusBadge status={p.status} />
+                  <StatusBadge status={p.status} meta={STATUS_META} fallback="WAIT" />
                 </td>
                 <td
                   style={{

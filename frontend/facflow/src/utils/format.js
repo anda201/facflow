@@ -47,3 +47,29 @@ export function displayDate(dateStr) {
     timeZone: "Asia/Seoul",
   }).format(d);
 }
+
+export function timeLabel(iso) {
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Seoul",
+  }).format(new Date(iso));
+}
+
+export function durationLabel(start, end) {
+  if (!start) return "—";
+  const startMs = new Date(start).getTime();
+  const endMs = end ? new Date(end).getTime() : Date.now();
+  const mins = Math.max(0, Math.round((endMs - startMs) / 60000));
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
+}
+
+export function defectRateOf(good, defect) {
+  const total = Number(good) + Number(defect);
+  if (total === 0) return 0;
+  return (Number(defect) / total) * 100;
+}

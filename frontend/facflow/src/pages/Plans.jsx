@@ -5,20 +5,21 @@ import {
   kstDateInputToIso,
 } from "../utils/format";
 import {
-  SummaryChip,
   CreatePlanForm,
   PlanDetailCard,
-  PlansHeader,
   PlanTable,
-  PlansToolbar,
 } from "../components/plans";
+import { PageHeader, SummaryChip, DateStatusToolbar } from "../components/common";
 import { COLORS } from "../constants/colors";
+import { PLAN_STATUS_FILTERS } from "../constants/planMeta";
 import {
   Clock,
   PlayCircle,
   CheckCircle2,
   Ban,
   ListTodo,
+  Plus,
+  X,
 } from "lucide-react";
 
 
@@ -158,16 +159,7 @@ export default function ProductionPlanDashboard() {
   }
 
   return (
-    <div
-      style={{
-        background: COLORS.bg,
-        color: COLORS.text,
-        minHeight: "100%",
-        width: "100%",
-        padding: "28px",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="dashboard">
       <style>{`
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
         select { cursor: pointer; }
@@ -175,10 +167,28 @@ export default function ProductionPlanDashboard() {
         tr.plan-row:hover { background: rgba(255,255,255,0.025); cursor: pointer; }
       `}</style>
 
-      <PlansHeader
-        showForm={showForm}
-        onToggleForm={() => setShowForm((v) => !v)}
-      />
+      <PageHeader title="생산 계획 관리" subtitle="PLAN MANAGER" icon={ListTodo}>
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            background: showForm ? "transparent" : COLORS.amber,
+            border: `1px solid ${COLORS.amber}`,
+            color: showForm ? COLORS.amber : "#1A1300",
+            borderRadius: 4,
+            padding: "9px 16px",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          {showForm ? <X size={15} /> : <Plus size={15} />}
+          {showForm ? "닫기" : "새 계획 등록"}
+        </button>
+      </PageHeader>
       {/* Summary strip */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
         <SummaryChip label="전체 계획" value={summary.totalPlans} color={COLORS.blue} Icon={ListTodo} />
@@ -198,7 +208,7 @@ export default function ProductionPlanDashboard() {
         />
       )}
 
-      <PlansToolbar
+      <DateStatusToolbar
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
         onTodayClick={() =>
@@ -206,6 +216,7 @@ export default function ProductionPlanDashboard() {
         }
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        statusFilters={PLAN_STATUS_FILTERS}
       />
       <PlanTable
         plans={plansForDate}

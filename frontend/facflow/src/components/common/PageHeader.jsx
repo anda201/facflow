@@ -1,21 +1,7 @@
-// src/components/common/PageHeader.jsx
-// 페이지 상단 헤더 (제목, 부제, 상태 배지)
-
 import React from "react";
-import { Factory } from "lucide-react";
+import { COLORS } from "../../constants/colors";
 
-const COLORS = {
-  panel: "#1B1F26",
-  hairline: "#2B313B",
-  amber: "#F5A623",
-  red: "#E5484D",
-  green: "#3DDC84",
-  muted: "#8A93A3",
-};
-
-function PageHeader({ title, subtitle, showAlert }) {
-  const statusColor = showAlert ? COLORS.red : COLORS.green;
-
+function PageHeader({ title, subtitle, icon: Icon, children }) {
   return (
     <div
       style={{
@@ -40,7 +26,7 @@ function PageHeader({ title, subtitle, showAlert }) {
             justifyContent: "center",
           }}
         >
-          <Factory size={20} color={COLORS.amber} />
+          <Icon size={20} color={COLORS.amber} />
         </div>
         <div>
           <div
@@ -65,30 +51,7 @@ function PageHeader({ title, subtitle, showAlert }) {
           </div>
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 11,
-          color: statusColor,
-          border: `1px solid ${statusColor}`,
-          borderRadius: 4,
-          padding: "6px 12px",
-        }}
-      >
-        <span
-          style={{
-            width: 7,
-            height: 7,
-            borderRadius: "50%",
-            background: statusColor,
-            display: "inline-block",
-          }}
-        />
-        {showAlert ? "라인 점검 필요" : "정상 가동"}
-      </div>
+      {children}
     </div>
   );
 }

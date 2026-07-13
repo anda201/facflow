@@ -1,10 +1,7 @@
-// src/components/plans/SummaryChip.jsx
-// 계획 요약 칩 컴포넌트
-
 import React from "react";
 import { COLORS } from "../../constants/colors";
 
-function SummaryChip({ label, value, color, Icon }) {
+function SummaryChip({ label, value, unit, color, Icon }) {
   return (
     <div
       style={{
@@ -34,16 +31,29 @@ function SummaryChip({ label, value, color, Icon }) {
         <Icon size={16} color={color} />
       </div>
       <div>
-        <div
-          style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: 22,
-            fontWeight: 600,
-            lineHeight: 1,
-            color: COLORS.text,
-          }}
-        >
-          {value}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+          <span
+            style={{
+              fontFamily: "'Oswald', sans-serif",
+              fontSize: 22,
+              fontWeight: 600,
+              lineHeight: 1,
+              color: COLORS.text,
+            }}
+          >
+            {value}
+          </span>
+          {unit && (
+            <span
+              style={{
+                fontFamily: "'Oswald', sans-serif",
+                fontSize: 12,
+                color: COLORS.muted,
+              }}
+            >
+              {unit}
+            </span>
+          )}
         </div>
         <div
           style={{

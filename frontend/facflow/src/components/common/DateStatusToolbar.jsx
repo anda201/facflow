@@ -1,18 +1,15 @@
-// src/components/plans/PlansToolbar.jsx
-// 날짜 선택 및 상태 필터 툴바 컴포넌트
-
 import React from "react";
 import { CalendarDays } from "lucide-react";
 import { COLORS } from "../../constants/colors";
-import { PLAN_STATUS_FILTERS } from "../../constants/planMeta";
 import { displayDate } from "../../utils/format";
 
-function PlansToolbar({
+function DateStatusToolbar({
   selectedDate,
   onDateChange,
   onTodayClick,
   statusFilter,
   onStatusFilterChange,
+  statusFilters,
 }) {
   return (
     <div
@@ -66,7 +63,7 @@ function PlansToolbar({
       </div>
 
       <div style={{ display: "flex", gap: 6 }}>
-        {PLAN_STATUS_FILTERS.map((c) => (
+        {statusFilters.map((c) => (
           <button
             key={c.key}
             onClick={() => onStatusFilterChange(c.key)}
@@ -77,6 +74,7 @@ function PlansToolbar({
               borderRadius: 3,
               padding: "6px 12px",
               fontSize: 11.5,
+              fontFamily: "'JetBrains Mono', monospace",
               cursor: "pointer",
             }}
           >
@@ -88,4 +86,4 @@ function PlansToolbar({
   );
 }
 
-export default PlansToolbar;
+export default DateStatusToolbar;
