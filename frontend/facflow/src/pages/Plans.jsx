@@ -1,26 +1,227 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { getPlan } from '../api';
+import React, { useEffect, useMemo, useState } from "react";
+import { getPlan, getIdleEquipment } from "../api";
+import {
+  toKstDateInputValue,
+  kstDateInputToIso,
+} from "../utils/format";
+import {
+  SummaryChip,
+  CreatePlanForm,
+  PlanDetailCard,
+  PlansHeader,
+  PlanTable,
+  PlansToolbar,
+} from "../components/plans";
+import { COLORS } from "../constants/colors";
+import {
+  Clock,
+  PlayCircle,
+  CheckCircle2,
+  Ban,
+  ListTodo,
+} from "lucide-react";
 
-const Plans = () => {
-    const [plans, setPlans] = useState(null);
-    useEffect(() => {
-        const fetchPlans = async () => {
-            const data = await getPlan();
-            setPlans(data);
-            console.log(data);
-        };
-        fetchPlans();
-    }, []);
 
-    return (
-        <div>
-        <h1>Plans</h1>
-            <p>
-                This is the plans page.
-            </p>
-        </div>  
-    );
+// get products from /products API 구현 예정
+const PRODUCTS = [
+  { productId: 1, productCode: "P-001", productName: "자동차 브레이크 패드" },
+  { productId: 4, productCode: "P-004", productName: "기어 샤프트" },
+  { productId: 6, productCode: "P-006", productName: "모터 커버" },
+  { productId: 7, productCode: "P-007", productName: "배터리 프레임" },
+  { productId: 9, productCode: "P-009", productName: "센서 모듈" },
+  { productId: 10, productCode: "P-010", productName: "제어 보드" },
+  { productId: 11, productCode: "P-011", productName: "스틸 플레이트" },
+  { productId: 13, productCode: "P-013", productName: "유압 밸브" },
+  { productId: 14, productCode: "P-014", productName: "실린더 블록" },
+  { productId: 16, productCode: "P-016", productName: "로봇 암 조인트" },
+  { productId: 17, productCode: "P-017", productName: "반도체 장비 부품" },
+  { productId: 19, productCode: "P-019", productName: "산업용 컨트롤러" },
+  { productId: 20, productCode: "P-020", productName: "스마트 센서 키트" },
+];
+
+
+const EMPTY_SUMMARY = {
+  totalPlans: 0,
+  waitPlans: 0,
+  runningPlans: 0,
+  completedPlans: 0,
+  canceledPlans: 0,
 };
 
-export default Plans;
+
+export default function ProductionPlanDashboard() { 
+    const [selectedDate, setSelectedDate] = useState(
+        toKstDateInputValue(new Date().toISOString())
+    );
+    const [statusFilter, setStatusFilter] = useState("ALL");
+    const [showForm, setShowForm] = useState(false);
+    const [flashId, setFlashId] = useState(null);
+    const [activePlanId, setActivePlanId] = useState(null);
+    
+    const [equipment, setEquipment] = useState([]);
+    const [plans, setPlans] = useState([]);
+    const [summary, setSummary] = useState(EMPTY_SUMMARY);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      const fetchEquipment = async () => {
+        try {
+          const equipmentData = await getIdleEquipment();
+          setEquipment(equipmentData ?? []);
+        } catch (e) {
+          setError(e);
+        }
+      };
+      fetchEquipment();
+    }, []);
+
+    useEffect(() => {
+      const fetchPlans = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const result = await getPlan({ planDate: selectedDate });
+          setPlans(result.plans ?? []);
+          setSummary(result.summary ?? EMPTY_SUMMARY);
+        } catch (e) {
+          setError(e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchPlans();
+    }, [selectedDate]);
+
+  const plansForDate = useMemo(() => {
+    return plans
+      .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
+      .sort((a, b) => b.planId - a.planId);
+  }, [plans, statusFilter]);
+
+  if (loading) {
+    return <div className="dashboard">로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className="dashboard">데이터를 불러오지 못했습니다.</div>;
+  }
+
+  const dateTargetTotal = plansForDate.reduce((s, p) => s + p.targetQty, 0);
+  const activePlan = plans.find((p) => p.planId === activePlanId) || null;
+
+  function handleCreate(form) {
+    const newPlan = {
+      planId: Math.max(0, ...plans.map((p) => p.planId)) + 1,
+      productId: form.productId,
+      productCode: form.productCode,
+      productName: form.productName,
+      planDate: kstDateInputToIso(form.planDate),
+      targetQty: form.targetQty,
+      status: "WAIT",
+      equipmentId: null,
+      createdAt: new Date().toISOString(),
+    };
+    setPlans((prev) => [newPlan, ...prev]);
+    setSelectedDate(form.planDate);
+    setStatusFilter("ALL");
+    setShowForm(false);
+    setFlashId(newPlan.planId);
+    setTimeout(() => setFlashId(null), 2200);
+  }
+
+  function handleStart(planId, equipmentId) {
+    setPlans((prev) =>
+      prev.map((p) =>
+        p.planId === planId ? { ...p, status: "RUNNING", equipmentId } : p
+      )
+    );
+    setEquipment((prev) =>
+      prev.map((e) =>
+        e.equipmentId === equipmentId ? { ...e, status: "RUN" } : e
+      )
+    );
+    setActivePlanId(null);
+  }
+
+  function handleDelete(planId) {
+    const target = plans.find((p) => p.planId === planId);
+    setPlans((prev) => prev.filter((p) => p.planId !== planId));
+    if (target && target.status === "RUN" && target.equipmentId) {
+      setEquipment((prev) =>
+        prev.map((e) =>
+          e.equipmentId === target.equipmentId ? { ...e, status: "IDLE" } : e
+        )
+      );
+    }
+    setActivePlanId(null);
+  }
+
+  return (
+    <div
+      style={{
+        background: COLORS.bg,
+        color: COLORS.text,
+        minHeight: "100%",
+        width: "100%",
+        padding: "28px",
+        boxSizing: "border-box",
+      }}
+    >
+      <style>{`
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+        select { cursor: pointer; }
+        @keyframes flashRow { 0% { background: rgba(245,166,35,0.22); } 100% { background: transparent; } }
+        tr.plan-row:hover { background: rgba(255,255,255,0.025); cursor: pointer; }
+      `}</style>
+
+      <PlansHeader
+        showForm={showForm}
+        onToggleForm={() => setShowForm((v) => !v)}
+      />
+      {/* Summary strip */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+        <SummaryChip label="전체 계획" value={summary.totalPlans} color={COLORS.blue} Icon={ListTodo} />
+        <SummaryChip label="대기" value={summary.waitPlans} color={COLORS.muted} Icon={Clock} />
+        <SummaryChip label="진행중" value={summary.runningPlans} color={COLORS.amber} Icon={PlayCircle} />
+        <SummaryChip label="완료" value={summary.completedPlans} color={COLORS.green} Icon={CheckCircle2} />
+        <SummaryChip label="취소" value={summary.canceledPlans} color={COLORS.red} Icon={Ban} />
+      </div>
+
+      {/* Create form */}
+      {showForm && (
+        <CreatePlanForm
+          products={PRODUCTS}
+          defaultDate={selectedDate}
+          onCancel={() => setShowForm(false)}
+          onCreate={handleCreate}
+        />
+      )}
+
+      <PlansToolbar
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+        onTodayClick={() =>
+          setSelectedDate(toKstDateInputValue(new Date().toISOString()))
+        }
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
+      <PlanTable
+        plans={plansForDate}
+        dateTargetTotal={dateTargetTotal}
+        flashId={flashId}
+        onRowClick={setActivePlanId}
+      />
+      {activePlan && (
+        <PlanDetailCard
+          plan={activePlan}
+          equipment={equipment}
+          onClose={() => setActivePlanId(null)}
+          onStart={handleStart}
+          onDelete={handleDelete}
+        />
+      )}
+    </div>
+  );
+}

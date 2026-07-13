@@ -6,8 +6,8 @@ export const getDashboard = async () => {
   };
 
   // requestBody : "planDate"
-export const getPlan = async (requestBody) => {
-    const { data } = await axiosInstance.get("/plan", requestBody);
+export const getPlan = async (params) => {
+    const { data } = await axiosInstance.get("/plan", { params });
     return data.result;
   };
 
@@ -30,8 +30,8 @@ export const startPlan = async (planId, requestBody) => {
   };
 
   // requestBody : "planDate"
-export const getProduction = async (requestBody) => {
-    const { data } = await axiosInstance.get("/production", requestBody);
+export const getProduction = async (params) => {
+    const { data } = await axiosInstance.get("/production", { params });
     return data.result;
   };
 
@@ -46,6 +46,6 @@ export const getEquipment = async () => {
   };
 
 export const getIdleEquipment = async () => {
-    const { data } = await axiosInstance.get("/equipment/idle");
+    const { data } = await axiosInstance.get("/idle-equipment");
     return data.result;
   };
