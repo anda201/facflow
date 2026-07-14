@@ -8,7 +8,7 @@ exports.selectPlanSummary = async function (connection, planDate) {
     `SELECT 
         COUNT(*) AS totalPlans,
         COUNT(CASE WHEN status = 'WAIT' THEN 1 END) AS waitPlans,
-        COUNT(CASE WHEN status = 'RUNNING' THEN 1 END) AS runningPlans,
+        COUNT(CASE WHEN status = 'RUN' THEN 1 END) AS runningPlans,
         COUNT(CASE WHEN status = 'DONE' THEN 1 END) AS completedPlans,
         COUNT(CASE WHEN status = 'CANCEL' THEN 1 END) AS canceledPlans
     FROM ProductPlan

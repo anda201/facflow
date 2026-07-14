@@ -51,8 +51,16 @@ exports.selectProductionList = async function (connection, productionDate) {
 
 exports.insertProduction = async function (connection, planId, equipmentId) {
     const Query = 
-        `INSERT INTO Production (planId, equipmentId, startTime) VALUES (?, ?, NOW());`;
-    const Params = [planId, equipmentId];
+        `
+        INSERT INTO Production (planId, equipmentId, startTime)
+        SELECT ?, ?, NOW()
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM Production
+            WHERE planId = ?
+        );
+        `;
+    const Params = [planId, equipmentId, planId];
 
     const [result] = await connection.query(Query, Params);
     return result;
