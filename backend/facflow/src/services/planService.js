@@ -101,7 +101,14 @@ exports.startPlan = async function (planId, equipmentId) {
 
         await planDao.updatePlanStatus(connection, planId, 'RUN');
         await equipmentDao.updateEquipmentStatus(connection, equipmentId, 'RUN');
-        const production = await productionDao.insertProduction(connection, planId, equipmentId);
+
+        const existingProduction = await productionDao.selectProductionByPlanId(connection, planId);
+        let production;
+        if (existingProduction) {
+            production = await productionDao.updateProductionEquipment(connection, planId, equipmentId);
+        } else {
+            production = await productionDao.insertProduction(connection, planId, equipmentId);
+        }
 
         await connection.commit();
 

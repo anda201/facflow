@@ -1,4 +1,5 @@
 const { pool } = require("../../config/database");
+const { now } = require("../utils/date");
 
 // - selectProductionSummary() : 생산 실적 현황 요약 데이터
 // - selectProductionList() : 생산 실적 목록 데이터
@@ -49,18 +50,40 @@ exports.selectProductionList = async function (connection, productionDate) {
 };
 
 
+exports.selectProductionByPlanId = async function (connection, planId) {
+    const Query =
+        `SELECT productionId, planId, equipmentId
+        FROM Production
+        WHERE planId = ?;`;
+    const Params = [planId];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows[0];
+};
+
+exports.updateProductionEquipment = async function (connection, planId, equipmentId) {
+    const Query =
+        `UPDATE Production
+        SET equipmentId = ?, startTime = ?
+        WHERE planId = ?;`;
+    const Params = [equipmentId, now(), planId];
+
+    const [result] = await connection.query(Query, Params);
+    return result;
+};
+
 exports.insertProduction = async function (connection, planId, equipmentId) {
     const Query = 
         `
         INSERT INTO Production (planId, equipmentId, startTime)
-        SELECT ?, ?, NOW()
+        SELECT ?, ?, ?
         WHERE NOT EXISTS (
             SELECT 1
             FROM Production
             WHERE planId = ?
         );
         `;
-    const Params = [planId, equipmentId, planId];
+    const Params = [planId, equipmentId, now(), planId];
 
     const [result] = await connection.query(Query, Params);
     return result;
@@ -86,9 +109,9 @@ exports.selectProductionById = async function (connection, productionId) {
 exports.endProduction = async function (connection, productionId, goodQty, defectQty) {
     const Query = 
         `UPDATE Production 
-        SET endTime = NOW(), goodQty = ?, defectQty = ? 
+        SET endTime = ?, goodQty = ?, defectQty = ? 
         WHERE productionId = ?;`;
-    const Params = [goodQty, defectQty, productionId];
+    const Params = [now(), goodQty, defectQty, productionId];
 
     const [result] = await connection.query(Query, Params);
     return result;
