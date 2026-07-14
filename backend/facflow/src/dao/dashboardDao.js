@@ -9,7 +9,7 @@ const { today } = require("../utils/date")
 // - selectProductChart() : 주간 제품별 생산량 차트
 // - selectWeeklyChart() : 주간 날짜별 생산량 추이 차트
 
-const DATE_SUB = today(); // 어제 날짜
+const DATE_SUB = today(); 
 
 exports.selectTodayProduction = async function (connection) {
   const Query = 
@@ -94,12 +94,12 @@ exports.selectProductChart = async function (connection) {
     FROM Production pr
     INNER JOIN ProductPlan pp ON pr.planId = pp.planId
     INNER JOIN Product prod ON pp.productId = prod.productId
-    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
+    WHERE pp.planDate BETWEEN DATE_SUB(?, INTERVAL 6 DAY) AND ?
     GROUP BY prod.productId, prod.productName
     ORDER BY productionQty DESC
     LIMIT 5;`;
 
-  const Params = [];
+  const Params = [today(), today()];
 
   const [rows] = await connection.query(Query, Params);
 
@@ -113,11 +113,11 @@ exports.selectWeeklyChart = async function (connection) {
       SUM(p.goodQty) AS productionQty
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
-    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
+    WHERE pp.planDate BETWEEN DATE_SUB(?, INTERVAL 6 DAY) AND ?
     GROUP BY pp.planDate
     ORDER BY pp.planDate;`;
 
-  const Params = [];
+  const Params = [today(), today()];
 
   const [rows] = await connection.query(Query, Params);
 
