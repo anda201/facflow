@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const NAV_LINKS = [
+    { to: '/dashboard', label: '생산현황' },
+    { to: '/plans', label: '생산계획' },
+    { to: '/productions', label: '생산실적' },
+    { to: '/equipments', label: '설비관리' },
+];
+
 const Navbar = () => {
+    const [expanded, setExpanded] = useState(false);
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container">
@@ -9,23 +18,29 @@ const Navbar = () => {
                     <img src="/facflow_icon.png" alt="FacFlow" height="30" className="me-2" />
                     <span className="fw-bold">FacFlow</span>
                 </Link>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    aria-controls="navbarNav"
+                    aria-expanded={expanded}
+                    aria-label="Toggle navigation"
+                    onClick={() => setExpanded((v) => !v)}
+                >
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
+                <div className={`collapse navbar-collapse${expanded ? ' show' : ''}`} id="navbarNav">
                     <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/dashboard">생산현황</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/plans">생산계획</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/productions">생산실적</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/equipments">설비관리</Link>
-                        </li>
+                        {NAV_LINKS.map(({ to, label }) => (
+                            <li className="nav-item" key={to}>
+                                <Link
+                                    className="nav-link"
+                                    to={to}
+                                    onClick={() => setExpanded(false)}
+                                >
+                                    {label}
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

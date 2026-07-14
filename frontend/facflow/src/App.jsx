@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import Plans from './pages/Plans'
 import Productions from './pages/Productions'
@@ -13,6 +12,7 @@ function App() {
       <section id="center" className='flex-1'>
         <div className="container">
           <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/productions" element={<Productions />} />
