@@ -51,7 +51,6 @@ exports.selectTodayDefect = async function (connection) {
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
     WHERE pp.planDate = ?;`;
   const Params = [DATE_SUB];
-
   const [rows] = await connection.query(Query, Params);
 
   return rows[0].todayDefect;
@@ -73,7 +72,7 @@ exports.selectEquipmentUtilization = async function (connection) {
   const Query = 
     `SELECT 
       IFNULL(
-        SUM(CASE WHEN status = 'RUNNING' THEN 1 ELSE 0 END) 
+        SUM(CASE WHEN status = 'RUN' THEN 1 ELSE 0 END)
         / NULLIF(COUNT(*), 0) * 100,
         0
       ) AS equipmentUtilization

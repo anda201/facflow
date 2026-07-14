@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getDashboard } from "../api";
 import { AchievementGaugeCard, Kpi, WeeklyProductionChart, ProductRanking} from "../components/dashboard";
 import { PageHeader, HeaderBadge, AlertBanner } from "../components/common";
-import { fmt, fmtPct } from "../utils/format";
+import { fmt, fmtPct, toKstDateInputValue } from "../utils/format";
 import { Factory } from "lucide-react";
 import { COLORS } from "../constants/colors";
 
@@ -43,7 +43,7 @@ export default function Dashboard() {
     <div className="dashboard">
       <PageHeader
         title="생산 현황 대시보드"
-        subtitle="LINE MONITOR · 2026-07-13 (MON) · 실시간"
+        subtitle={`LINE MONITOR · ${toKstDateInputValue(new Date().toISOString())} · 실시간`}
         icon={Factory}
       >
         <HeaderBadge

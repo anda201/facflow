@@ -3,7 +3,7 @@ exports.selectEquipmentSummary = async function (connection) {
   const Query = 
     `SELECT 
       COUNT(*) AS totalEquipment,
-      COUNT(CASE WHEN status = 'RUNNING' THEN 1 END) AS runningEquipment,
+      COUNT(CASE WHEN status = 'RUN' THEN 1 END) AS runningEquipment,
       COUNT(CASE WHEN status = 'IDLE' THEN 1 END) AS idleEquipment,
       COUNT(CASE WHEN status = 'STOP' THEN 1 END) AS stoppedEquipment
     FROM Equipment;`;

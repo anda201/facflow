@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getPlan, getIdleEquipment } from "../api";
+import { getPlan, getIdleEquipment, createPlan, startPlan } from "../api";
 import {
   toKstDateInputValue,
-  kstDateInputToIso,
 } from "../utils/format";
 import {
   CreatePlanForm,
@@ -64,6 +63,7 @@ export default function ProductionPlanDashboard() {
     const [summary, setSummary] = useState(EMPTY_SUMMARY);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [createError, setCreateError] = useState(null);
 
     useEffect(() => {
       const fetchEquipment = async () => {
@@ -111,38 +111,60 @@ export default function ProductionPlanDashboard() {
   const dateTargetTotal = plansForDate.reduce((s, p) => s + p.targetQty, 0);
   const activePlan = plans.find((p) => p.planId === activePlanId) || null;
 
-  function handleCreate(form) {
-    const newPlan = {
-      planId: Math.max(0, ...plans.map((p) => p.planId)) + 1,
+
+  async function handleCreate(form) {
+    const requestBody = {
       productId: form.productId,
-      productCode: form.productCode,
-      productName: form.productName,
-      planDate: kstDateInputToIso(form.planDate),
+      planDate: form.planDate,
       targetQty: form.targetQty,
-      status: "WAIT",
-      equipmentId: null,
-      createdAt: new Date().toISOString(),
     };
-    setPlans((prev) => [newPlan, ...prev]);
-    setSelectedDate(form.planDate);
-    setStatusFilter("ALL");
-    setShowForm(false);
-    setFlashId(newPlan.planId);
-    setTimeout(() => setFlashId(null), 2200);
+
+    try {
+      setCreateError(null);
+      const planId = await createPlan(requestBody);
+      const dateChanged = form.planDate !== selectedDate;
+
+      setSelectedDate(form.planDate);
+      setStatusFilter("ALL");
+      setShowForm(false);
+
+      if (!dateChanged) {
+        const result = await getPlan({ planDate: form.planDate });
+        setPlans(result.plans ?? []);
+        setSummary(result.summary ?? EMPTY_SUMMARY);
+      }
+
+      setFlashId(planId);
+      setTimeout(() => setFlashId(null), 2200);
+
+    } catch (e) {
+      setCreateError("계획 등록에 실패했습니다.");
+    }
   }
 
-  function handleStart(planId, equipmentId) {
-    setPlans((prev) =>
-      prev.map((p) =>
-        p.planId === planId ? { ...p, status: "RUNNING", equipmentId } : p
-      )
-    );
-    setEquipment((prev) =>
-      prev.map((e) =>
-        e.equipmentId === equipmentId ? { ...e, status: "RUN" } : e
-      )
-    );
-    setActivePlanId(null);
+  async function handleStart(planId, equipmentId) {
+    const requestBody = {
+      equipmentId: equipmentId,
+    };
+
+    try {
+      const response = await startPlan(planId, requestBody);
+      setPlans((prev) =>
+        prev.map((p) =>
+          p.planId === planId ? { ...p, status: "RUN", equipmentId } : p
+        )
+      );
+      setEquipment((prev) =>
+        prev.map((e) =>
+          e.equipmentId === equipmentId ? { ...e, status: "RUN" } : e
+        )
+      );
+      setFlashId(planId);
+      setTimeout(() => setFlashId(null), 2200);
+      setActivePlanId(null);
+    } catch (e) {
+      setError(e);
+    }
   }
 
   function handleDelete(planId) {
@@ -169,7 +191,10 @@ export default function ProductionPlanDashboard() {
 
       <PageHeader title="생산 계획 관리" subtitle="PLAN MANAGER" icon={ListTodo}>
         <button
-          onClick={() => setShowForm((v) => !v)}
+          onClick={() => {
+            setShowForm((v) => !v);
+            setCreateError(null);
+          }}
           style={{
             display: "flex",
             alignItems: "center",
@@ -203,7 +228,11 @@ export default function ProductionPlanDashboard() {
         <CreatePlanForm
           products={PRODUCTS}
           defaultDate={selectedDate}
-          onCancel={() => setShowForm(false)}
+          serverError={createError}
+          onCancel={() => {
+            setShowForm(false);
+            setCreateError(null);
+          }}
           onCreate={handleCreate}
         />
       )}

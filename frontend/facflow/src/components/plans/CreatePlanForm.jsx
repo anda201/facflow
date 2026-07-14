@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 
-function CreatePlanForm({ products, defaultDate, onCancel, onCreate }) {
+function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate }) {
   const [productId, setProductId] = useState(
     String(products[0]?.productId ?? "")
   );
@@ -53,8 +53,6 @@ function CreatePlanForm({ products, defaultDate, onCancel, onCreate }) {
     }
     onCreate({
       productId: product.productId,
-      productCode: product.productCode,
-      productName: product.productName,
       planDate,
       targetQty: qty,
     });
@@ -145,9 +143,9 @@ function CreatePlanForm({ products, defaultDate, onCancel, onCreate }) {
         </div>
       </div>
 
-      {error && (
+      {(error || serverError) && (
         <div style={{ color: COLORS.red, fontSize: 12, marginBottom: 12 }}>
-          {error}
+          {error || serverError}
         </div>
       )}
 
