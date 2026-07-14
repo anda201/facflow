@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import { StatusBadge } from "../common";
-import { PRODUCTION_STATUS_META } from "../../constants/productionMeta";
+import { PRODUCTION_STATUS_META } from "../../constants/statusMeta";
 import { COLORS } from "../../constants/colors";
 import { fmt, timeLabel, defectRateOf } from "../../utils/format";
 

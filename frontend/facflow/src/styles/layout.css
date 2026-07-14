@@ -25,3 +25,8 @@
     grid-template-columns: 1.5fr 1fr;
     gap: 14px;
 }
+
+@keyframes ledPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 9px 2px currentColor; }
+    50% { opacity: 0.55; box-shadow: 0 0 4px 1px currentColor; }
+}

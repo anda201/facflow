@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import { COLORS } from "../../constants/colors";
-import { STATUS_META } from "../../constants/planMeta";
-import { EQUIP_META } from "../../constants/planMeta";
+import { PLAN_STATUS_META, EQUIP_META } from "../../constants/statusMeta";
 import { fmt, toKstDateInputValue, displayDate } from "../../utils/format";
 
 function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
@@ -103,7 +102,7 @@ function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
           }}
         >
           {[
-            ["상태", <StatusBadge status={plan.status} meta={STATUS_META} fallback="WAIT" key="s" />],
+            ["상태", <StatusBadge status={plan.status} meta={PLAN_STATUS_META} fallback="WAIT" key="s" />],
             ["생산 예정일", displayDate(toKstDateInputValue(plan.planDate))],
             ["목표 수량", `${fmt(plan.targetQty)} EA`],
             ["등록일", toKstDateInputValue(plan.createdAt)],

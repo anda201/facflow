@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { ProductionDetailCard, ProductionTable } from "../components/productions";
 import { SummaryChip, PageHeader, HeaderBadge, DateStatusToolbar } from "../components/common";
-import { PRODUCTION_STATUS_FILTERS } from "../constants/productionMeta";
+import { PRODUCTION_STATUS_FILTERS } from "../constants/statusMeta";
 import { COLORS } from "../constants/colors";
 import {
   fmt,

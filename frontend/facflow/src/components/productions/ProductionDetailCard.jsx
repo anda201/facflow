@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { X, PlayCircle, Check, CheckCircle2 } from "lucide-react";
 import { StatusBadge } from "../common";
 import { COLORS } from "../../constants/colors";
-import { PRODUCTION_STATUS_META } from "../../constants/productionMeta";
+import { PRODUCTION_STATUS_META } from "../../constants/statusMeta";
 import { fmt, timeLabel, durationLabel, defectRateOf } from "../../utils/format";
 
 function ProductionDetailCard({ production, onClose, onComplete }) {

@@ -21,7 +21,7 @@ function StatusBadge({ status, meta, fallback }) {
         padding: "3px 8px",
       }}
     >
-      <Icon size={12} />
+      {Icon ? <Icon size={12} /> : null}
       {resolved.label}
     </span>
   );

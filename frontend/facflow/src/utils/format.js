@@ -48,6 +48,15 @@ export function displayDate(dateStr) {
   }).format(d);
 }
 
+export function kstDateLabel(iso) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(iso));
+}
+
 export function timeLabel(iso) {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("ko-KR", {

@@ -11,7 +11,7 @@ import {
 } from "../components/plans";
 import { PageHeader, SummaryChip, DateStatusToolbar } from "../components/common";
 import { COLORS } from "../constants/colors";
-import { PLAN_STATUS_FILTERS } from "../constants/planMeta";
+import { PLAN_STATUS_FILTERS } from "../constants/statusMeta";
 import {
   Clock,
   PlayCircle,

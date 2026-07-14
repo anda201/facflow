@@ -1,18 +1,28 @@
 import React from "react";
 import { COLORS } from "../../constants/colors";
 
-function SummaryChip({ label, value, unit, color, Icon }) {
+function SummaryChip({ label, value, unit, color, Icon, active, onClick }) {
+  const Wrapper = onClick ? "button" : "div";
+
   return (
-    <div
+    <Wrapper
+      type={onClick ? "button" : undefined}
+      onClick={onClick}
       style={{
         flex: 1,
-        background: COLORS.panel,
-        border: `1px solid ${COLORS.hairline}`,
+        background: active ? `${color}14` : COLORS.panel,
+        border: `1px solid ${active ? color : COLORS.hairline}`,
         borderRadius: 4,
         padding: "14px 16px",
         display: "flex",
         alignItems: "center",
         gap: 12,
+        ...(onClick && {
+          cursor: "pointer",
+          textAlign: "left",
+          fontFamily: "inherit",
+          minWidth: 0,
+        }),
       }}
     >
       <div
@@ -30,7 +40,7 @@ function SummaryChip({ label, value, unit, color, Icon }) {
       >
         <Icon size={16} color={color} />
       </div>
-      <div>
+      <div style={{ minWidth: onClick ? 0 : undefined }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
           <span
             style={{
@@ -62,12 +72,17 @@ function SummaryChip({ label, value, unit, color, Icon }) {
             color: COLORS.muted,
             marginTop: 3,
             letterSpacing: "0.04em",
+            ...(onClick && {
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }),
           }}
         >
           {label}
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 }
 
