@@ -94,7 +94,7 @@ exports.selectProductChart = async function (connection) {
     FROM Production pr
     INNER JOIN ProductPlan pp ON pr.planId = pp.planId
     INNER JOIN Product prod ON pp.productId = prod.productId
-    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
+    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
     GROUP BY prod.productId, prod.productName
     ORDER BY productionQty DESC
     LIMIT 5;`;
@@ -113,7 +113,7 @@ exports.selectWeeklyChart = async function (connection) {
       SUM(p.goodQty) AS productionQty
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
-    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
+    WHERE pp.planDate BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
     GROUP BY pp.planDate
     ORDER BY pp.planDate;`;
 
