@@ -4,8 +4,10 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { COLORS } from "../../constants/colors";
+import { toKstDateInputValue } from "../../utils/format";
 
 function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate }) {
+  const today = toKstDateInputValue(new Date().toISOString());
   const [productId, setProductId] = useState(
     String(products[0]?.productId ?? "")
   );
@@ -13,6 +15,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
   const [dueDate, setDueDate] = useState(defaultDate);
   const [targetQty, setTargetQty] = useState("");
   const [error, setError] = useState("");
+  const dueDateMin = planDate >= today ? planDate : today;
 
   const inputStyle = {
     background: COLORS.panelAlt,
@@ -43,8 +46,20 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
       setError("생산 예정일을 선택하세요.");
       return;
     }
+    if (planDate < today) {
+      setError("생산 예정일은 오늘부터 선택할 수 있습니다.");
+      return;
+    }
     if (!dueDate) {
       setError("생산 완료일을 선택하세요.");
+      return;
+    }
+    if (dueDate < dueDateMin) {
+      setError(
+        planDate >= today
+          ? "생산 완료일은 생산 예정일부터 선택할 수 있습니다."
+          : "생산 완료일은 오늘부터 선택할 수 있습니다."
+      );
       return;
     }
     if (!qty || qty <= 0) {
@@ -132,6 +147,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
           <input
             type="date"
             value={planDate}
+            min={today}
             onChange={(e) => setPlanDate(e.target.value)}
             style={inputStyle}
           />
@@ -141,6 +157,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
           <input
             type="date"
             value={dueDate}
+            min={dueDateMin}
             onChange={(e) => setDueDate(e.target.value)}
             style={inputStyle}
           />
