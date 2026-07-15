@@ -1,3 +1,4 @@
+const { today } = require("../utils/date");
 
 exports.selectEquipmentSummary = async function (connection) {
   const Query = 
@@ -50,3 +51,25 @@ exports.updateEquipmentStatus = async function (connection, equipmentId, status)
   const [result] = await connection.query(Query, Params);
   return result;
 };    
+
+
+// productionQty(한달간 생산 총량), defectQty(한달간 불량 총량), defectRate(한달간 불량률)
+exports.getEquipmentDetail = async function (connection, equipmentId) {
+  const Query = `
+    SELECT
+      IFNULL(SUM(IFNULL(p.goodQty, 0) + IFNULL(p.defectQty, 0)), 0) AS productionQty,
+      IFNULL(SUM(IFNULL(p.defectQty, 0)), 0) AS defectQty,
+      IFNULL(
+        SUM(IFNULL(p.defectQty, 0)) / NULLIF(SUM(IFNULL(p.goodQty, 0) + IFNULL(p.defectQty, 0)), 0) * 100,
+        0
+      ) AS defectRate
+    FROM Production p
+    WHERE p.equipmentId = ?
+      AND p.endTime IS NOT NULL
+      AND p.startTime >= DATE_SUB(?, INTERVAL 29 DAY)
+      AND p.startTime < DATE_ADD(?, INTERVAL 1 DAY);`;
+  const Params = [equipmentId, today(), today()];
+
+  const [rows] = await connection.query(Query, Params);
+  return rows[0];
+};

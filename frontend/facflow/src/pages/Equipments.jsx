@@ -72,7 +72,6 @@ export default function EquipmentStatusDashboard() {
 
   const activeEquip = equipments.find((e) => e.equipmentId === activeId) || null;
 
-  // PATCH /equipment/{id}/status { status: 'STOP' } — API 연동 후 refetch로 대체 가능
   async function handleSetStop(equipmentId) {
     try {
       const result = await updateEquipmentStatus(equipmentId, { status: "STOP" });

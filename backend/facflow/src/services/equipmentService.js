@@ -3,6 +3,12 @@ const { logger } = require("../../config/winston");
 
 const equipmentDao = require("../dao/equipmentDao");
 
+const EMPTY_EQUIPMENT_STATS = {
+  productionQty: 0,
+  defectQty: 0,
+  defectRate: 0,
+};
+
 exports.getEquipment = async function () {
   let connection;
 
@@ -71,6 +77,28 @@ exports.updateEquipmentStatus = async function (equipmentId, status) {
     return result;
   } catch (err) {
     logger.error(`updateEquipmentStatus DB Query error\n: ${JSON.stringify(err)}`);
+    throw err;
+  }
+  finally {
+    connection.release();
+  }
+};
+
+exports.getEquipmentDetail = async function (equipmentId) {
+  let connection;
+
+  try {
+    connection = await pool.getConnection(async (conn) => conn);
+  } catch (err) {
+    logger.error(`getEquipmentDetail DB Connection error\n: ${JSON.stringify(err)}`);
+    throw err;
+  }
+
+  try {
+    const result = await equipmentDao.getEquipmentDetail(connection, equipmentId);
+    return result ?? EMPTY_EQUIPMENT_STATS;
+  } catch (err) {
+    logger.error(`getEquipmentDetail DB Query error\n: ${JSON.stringify(err)}`);
     throw err;
   }
   finally {

@@ -1,22 +1,39 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, ShieldAlert, PackageCheck, AlertTriangle, Gauge } from "lucide-react";
 import { StatusBadge } from "../common";
 import { EQUIP_META } from "../../constants/statusMeta";
 import { COLORS } from "../../constants/colors";
-import { fmt, fmtPct, kstDateLabel, defectRateOf } from "../../utils/format";
+import { fmt, fmtPct, kstDateLabel } from "../../utils/format";
+import { getEquipmentDetail } from "../../api";
 
-// TODO: API 연동 후 삭제 — GET /equipment/{id}/stats?range=30d
-function mockEquipmentMonthlyStats(equipmentId) {
-  const seed = equipmentId * 37;
-  const productionQty = 1400 + (seed % 2200);
-  const defectQty = Math.round(productionQty * (0.01 + ((seed % 50) / 1000)));
-  const defectRate = defectRateOf(productionQty - defectQty, defectQty);
-  return { productionQty, defectQty, defectRate };
-}
+const EMPTY_STATS = {
+  productionQty: 0,
+  defectQty: 0,
+  defectRate: 0,
+};
 
 function EquipmentDetailCard({ eq, onClose, onSetStop }) {
-  const stats = useMemo(() => mockEquipmentMonthlyStats(eq.equipmentId), [eq.equipmentId]);
+  const [stats, setStats] = useState(EMPTY_STATS);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(null);
   const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        setStatsError(null);
+        const result = await getEquipmentDetail(eq.equipmentId);
+        setStats(result ?? EMPTY_STATS);
+      } catch (e) {
+        setStatsError(e);
+        setStats(EMPTY_STATS);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, [eq.equipmentId]);
 
   function handleStopClick() {
     if (eq.status === "RUN") {
@@ -115,45 +132,71 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
             최근 30일 생산 실적
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {[
-              { label: "생산수", value: fmt(stats.productionQty), unit: "EA", color: COLORS.text, Icon: PackageCheck },
-              { label: "불량수", value: fmt(stats.defectQty), unit: "EA", color: COLORS.red, Icon: AlertTriangle },
-              {
-                label: "불량률",
-                value: fmtPct(stats.defectRate, 2),
-                unit: "%",
-                color: stats.defectRate > 5 ? COLORS.red : COLORS.amber,
-                Icon: Gauge,
-              },
-            ].map((s) => (
+            {statsLoading ? (
               <div
-                key={s.label}
                 style={{
-                  background: COLORS.panelAlt,
-                  border: `1px solid ${COLORS.hairline}`,
-                  borderRadius: 4,
-                  padding: "12px 10px",
+                  gridColumn: "1 / -1",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 11.5,
+                  color: COLORS.faint,
+                  padding: "8px 0",
                 }}
               >
-                <s.Icon size={13} color={s.color} style={{ marginBottom: 6 }} />
-                <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-                  <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: 17, fontWeight: 600, color: s.color }}>
-                    {s.value}
-                  </span>
-                  <span style={{ fontSize: 10.5, color: COLORS.faint }}>{s.unit}</span>
-                </div>
+                생산 실적 불러오는 중...
+              </div>
+            ) : statsError ? (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 11.5,
+                  color: COLORS.red,
+                  padding: "8px 0",
+                }}
+              >
+                생산 실적을 불러오지 못했습니다.
+              </div>
+            ) : (
+              [
+                { label: "생산수", value: fmt(stats.productionQty), unit: "EA", color: COLORS.text, Icon: PackageCheck },
+                { label: "불량수", value: fmt(stats.defectQty), unit: "EA", color: COLORS.red, Icon: AlertTriangle },
+                {
+                  label: "불량률",
+                  value: fmtPct(stats.defectRate, 2),
+                  unit: "%",
+                  color: stats.defectRate > 5 ? COLORS.red : COLORS.amber,
+                  Icon: Gauge,
+                },
+              ].map((s) => (
                 <div
+                  key={s.label}
                   style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    color: COLORS.faint,
-                    marginTop: 3,
+                    background: COLORS.panelAlt,
+                    border: `1px solid ${COLORS.hairline}`,
+                    borderRadius: 4,
+                    padding: "12px 10px",
                   }}
                 >
-                  {s.label}
+                  <s.Icon size={13} color={s.color} style={{ marginBottom: 6 }} />
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
+                    <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: 17, fontWeight: 600, color: s.color }}>
+                      {s.value}
+                    </span>
+                    <span style={{ fontSize: 10.5, color: COLORS.faint }}>{s.unit}</span>
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 10,
+                      color: COLORS.faint,
+                      marginTop: 3,
+                    }}
+                  >
+                    {s.label}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

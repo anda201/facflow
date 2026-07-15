@@ -53,7 +53,12 @@ export const getIdleEquipment = async () => {
 export const updateEquipmentStatus = async (equipmentId, requestBody) => {
     const { data } = await axiosInstance.patch(`/equipment/${equipmentId}/status`, requestBody);
     return data.result;
-  };
+};
+
+export const getEquipmentDetail = async (equipmentId) => {
+    const { data } = await axiosInstance.get(`/equipment/${equipmentId}/detail`);
+    return data.result;
+};
 
 export const getProducts = async () => {
     const { data } = await axiosInstance.get("/product");
