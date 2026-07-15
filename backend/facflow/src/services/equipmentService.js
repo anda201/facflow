@@ -54,3 +54,26 @@ exports.getIdleEquipment = async function () {
         connection.release();
     }
 };
+
+// 생산중인 설비가 멈출 경우 이후 로직 구현 필요
+exports.updateEquipmentStatus = async function (equipmentId, status) {
+  let connection;
+
+  try {
+    connection = await pool.getConnection(async (conn) => conn);
+  } catch (err) {
+    logger.error(`updateEquipmentStatus DB Connection error\n: ${JSON.stringify(err)}`);
+    throw err;
+  }
+
+  try {
+    const result = await equipmentDao.updateEquipmentStatus(connection, equipmentId, status);
+    return result;
+  } catch (err) {
+    logger.error(`updateEquipmentStatus DB Query error\n: ${JSON.stringify(err)}`);
+    throw err;
+  }
+  finally {
+    connection.release();
+  }
+};

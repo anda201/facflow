@@ -50,6 +50,11 @@ export const getIdleEquipment = async () => {
     return data.result;
   };
 
+export const updateEquipmentStatus = async (equipmentId, requestBody) => {
+    const { data } = await axiosInstance.patch(`/equipment/${equipmentId}/status`, requestBody);
+    return data.result;
+  };
+
 export const getProducts = async () => {
     const { data } = await axiosInstance.get("/product");
     return data.result;

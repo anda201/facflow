@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { PageHeader, SummaryChip } from "../components/common";
 import { EquipmentCard, EquipmentDetailCard } from "../components/equipments";
-import { getEquipment } from "../api";
+import { getEquipment, updateEquipmentStatus } from "../api";
 import { COLORS } from "../constants/colors";
 import {
   Wrench,
@@ -73,16 +73,21 @@ export default function EquipmentStatusDashboard() {
   const activeEquip = equipments.find((e) => e.equipmentId === activeId) || null;
 
   // PATCH /equipment/{id}/status { status: 'STOP' } — API 연동 후 refetch로 대체 가능
-  function handleSetStop(equipmentId) {
-    const target = equipments.find((e) => e.equipmentId === equipmentId);
-    if (!target || target.status === "STOP") return;
+  async function handleSetStop(equipmentId) {
+    try {
+      const result = await updateEquipmentStatus(equipmentId, { status: "STOP" });
+      setEquipments((prev) =>
+        prev.map((e) => (e.equipmentId === equipmentId ? { ...e, status: "STOP" } : e))
+      );
 
-    setEquipments((prev) =>
-      prev.map((e) => (e.equipmentId === equipmentId ? { ...e, status: "STOP" } : e))
-    );
-    setSummary((prev) => patchSummary(prev, target.status, "STOP"));
-    setActiveId(null);
-  }
+      console.log(result);
+      setSummary((prev) => patchSummary(prev, result.status, "STOP"));
+      setActiveId(null);
+
+    } catch (e) {
+      setError(e);
+    }
+  };
 
   if (loading) {
     return <div className="dashboard">로딩 중...</div>;

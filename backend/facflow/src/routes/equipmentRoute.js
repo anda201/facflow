@@ -3,4 +3,5 @@ module.exports = function (app) {
   
     app.get("/equipment", equipment.getEquipment);
     app.get("/idle-equipment", equipment.getIdleEquipment);
+    app.patch("/equipment/:equipmentId/status", equipment.updateEquipmentStatus);
   };
