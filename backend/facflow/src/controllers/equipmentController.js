@@ -28,7 +28,8 @@ exports.getEquipment = async function (req, res) {
 
 exports.getIdleEquipment = async function (req, res) {
     try {
-        const result = await equipmentService.getIdleEquipment();
+        const { productId } = req.query;
+        const result = await equipmentService.getIdleEquipment(productId);
 
         return res.send({
             result: result,

@@ -59,3 +59,45 @@ exports.updatePlanStatus = async function (connection, planId, status) {
     const [result] = await connection.query(Query, Params);
     return result;
 };
+
+
+exports.recommendEquipment = async function (connection, planId) {
+    const Query = 
+        `SELECT
+            e.equipmentId,
+            IFNULL(p.targetQty / epp.hourlyCapacity, 0) AS estimatedHours
+        FROM Equipment e
+        INNER JOIN EquipmentProduct epp
+            ON e.equipmentId = epp.equipmentId
+        INNER JOIN ProductPlan p
+            ON p.productId = epp.productId
+        WHERE p.planId = ?
+        AND e.status = 'IDLE'
+        ORDER BY epp.hourlyCapacity DESC
+        LIMIT 1;`
+    
+    const Params = [planId];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows;
+};
+
+exports.selectIdleEquipmentByPlanId = async function (connection, planId) {
+    const Query =
+        `SELECT
+            e.equipmentId,
+            e.equipmentName,
+            e.status,
+            e.createdAt
+        FROM Equipment e
+        INNER JOIN EquipmentProduct epp ON e.equipmentId = epp.equipmentId
+        INNER JOIN ProductPlan p ON p.productId = epp.productId
+        WHERE p.planId = ?
+          AND e.status = 'IDLE'
+        ORDER BY e.equipmentId ASC;`;
+    const Params = [planId];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows;
+};
+

@@ -38,7 +38,7 @@ exports.getEquipment = async function () {
 };
 
 
-exports.getIdleEquipment = async function () {
+exports.getIdleEquipment = async function (productId) {
     let connection;
 
     try {
@@ -49,7 +49,7 @@ exports.getIdleEquipment = async function () {
     }
 
     try {
-        const equipments = await equipmentDao.selectIdleEquipment(connection);
+        const equipments = await equipmentDao.selectIdleEquipment(connection, productId);
         return equipments;
     }
     catch (err) {

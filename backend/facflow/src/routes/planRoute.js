@@ -7,5 +7,6 @@ module.exports = function (app) {
     app.post("/plan", plan.createPlan);
     app.patch("/plan/:planId", plan.updatePlanStatus);
     app.patch("/plan/:planId/start", plan.startPlan);
+    app.get("/plan/:planId/available-equipment", plan.getAvailableEquipment);
   };
   

@@ -124,3 +124,31 @@ exports.startPlan = async function (planId, equipmentId) {
         connection.release();
     }
 };
+
+
+exports.getAvailableEquipment = async function (planId) {
+    let connection;
+    try {
+        connection = await pool.getConnection(async (conn) => conn);
+    } catch (err) {
+        logger.error(`getAvailableEquipment DB Connection error\n: ${JSON.stringify(err)}`);
+        throw err;
+    }
+
+    try {
+        const [equipments, recommendationRows] = await Promise.all([
+            planDao.selectIdleEquipmentByPlanId(connection, planId),
+            planDao.recommendEquipment(connection, planId),
+        ]);
+
+        return {
+            equipments,
+            recommendation: recommendationRows[0] ?? null,
+        };
+    } catch (err) {
+        logger.error(`getAvailableEquipment DB Query error\n: ${JSON.stringify(err)}`);
+        throw err;
+    } finally {
+        connection.release();
+    }
+};

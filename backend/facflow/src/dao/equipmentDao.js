@@ -29,17 +29,19 @@ exports.selectEquipmentList = async function (connection) {
   return rows;
 };
 
-exports.selectIdleEquipment = async function (connection) {
+exports.selectIdleEquipment = async function (connection, productId) {
   const Query = 
     `SELECT 
-      equipmentId,
-      equipmentName,
-      status,
-      createdAt
-    FROM Equipment
-    WHERE status = 'IDLE'
-    ORDER BY equipmentId ASC;`;
-  const Params = [];
+      e.equipmentId,
+      e.equipmentName,
+      e.status,
+      e.createdAt
+    FROM Equipment e
+    INNER JOIN EquipmentProduct epp ON e.equipmentId = epp.equipmentId
+    WHERE e.status = 'IDLE'
+      AND epp.productId = ?
+    ORDER BY e.equipmentId ASC;`;
+  const Params = [productId];
   const [rows] = await connection.query(Query, Params);
   return rows;
 };
