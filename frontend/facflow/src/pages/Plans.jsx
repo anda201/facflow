@@ -165,6 +165,11 @@ export default function ProductionPlanDashboard() {
           p.planId === planId ? { ...p, status: "RUN", equipmentId } : p
         )
       );
+      setSummary((prev) => ({
+        ...prev,
+        waitPlans: prev.waitPlans - 1,
+        runningPlans: prev.runningPlans + 1,
+      }));
       setEquipment((prev) =>
         prev.map((e) =>
           e.equipmentId === equipmentId ? { ...e, status: "RUN" } : e
@@ -178,9 +183,17 @@ export default function ProductionPlanDashboard() {
     }
   }
 
+// 구현 예정
   function handleDelete(planId) {
     const target = plans.find((p) => p.planId === planId);
     setPlans((prev) => prev.filter((p) => p.planId !== planId));
+    if (target?.status === "WAIT") {
+      setSummary((prev) => ({
+        ...prev,
+        totalPlans: prev.totalPlans - 1,
+        waitPlans: prev.waitPlans - 1,
+      }));
+    }
     if (target && target.status === "RUN" && target.equipmentId) {
       setEquipment((prev) =>
         prev.map((e) =>
