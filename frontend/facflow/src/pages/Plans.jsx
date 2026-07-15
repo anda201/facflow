@@ -129,6 +129,7 @@ export default function ProductionPlanDashboard() {
     const requestBody = {
       productId: form.productId,
       planDate: form.planDate,
+      dueDate: form.dueDate,
       targetQty: form.targetQty,
     };
 

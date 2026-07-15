@@ -28,10 +28,10 @@ exports.getPlan = async function (req, res) {
 
 exports.createPlan = async function (req, res) {
   try {
-    const { productId, planDate, targetQty, status } = req.body;
+    const { productId, planDate, dueDate, targetQty } = req.body;
     //validation + error handling 추가 예정
 
-    const result = await planService.createPlan(productId, planDate, targetQty);
+    const result = await planService.createPlan(productId, planDate, dueDate, targetQty);
    
     return res.send({
       result: result,

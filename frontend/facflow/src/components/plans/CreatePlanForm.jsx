@@ -10,6 +10,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
     String(products[0]?.productId ?? "")
   );
   const [planDate, setPlanDate] = useState(defaultDate);
+  const [dueDate, setDueDate] = useState(defaultDate);
   const [targetQty, setTargetQty] = useState("");
   const [error, setError] = useState("");
 
@@ -42,6 +43,10 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
       setError("생산 예정일을 선택하세요.");
       return;
     }
+    if (!dueDate) {
+      setError("생산 완료일을 선택하세요.");
+      return;
+    }
     if (!qty || qty <= 0) {
       setError("목표 수량을 1 이상으로 입력하세요.");
       return;
@@ -54,6 +59,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
     onCreate({
       productId: product.productId,
       planDate,
+      dueDate,
       targetQty: qty,
     });
   }
@@ -102,7 +108,7 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.4fr 1fr 1fr",
+          gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
           gap: 14,
           marginBottom: 14,
         }}
@@ -127,6 +133,15 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
             type="date"
             value={planDate}
             onChange={(e) => setPlanDate(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+        <div>
+          <label style={labelStyle}>생산 완료일</label>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
             style={inputStyle}
           />
         </div>

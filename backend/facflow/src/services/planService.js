@@ -39,7 +39,7 @@ exports.getPlan = async function (planDate) {
 };
 
 
-exports.createPlan = async function (productId, planDate, targetQty) {
+exports.createPlan = async function (productId, planDate, dueDate, targetQty) {
     let connection;
     
     try {
@@ -52,7 +52,7 @@ exports.createPlan = async function (productId, planDate, targetQty) {
     }
 
     try {
-        const result = await planDao.insertPlan(connection, productId, planDate, targetQty);
+        const result = await planDao.insertPlan(connection, productId, planDate, dueDate, targetQty);
         return result.insertId;
 
     } catch (err) {

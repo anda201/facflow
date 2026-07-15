@@ -41,10 +41,10 @@ exports.selectPlanList = async function (connection, planDate) {
 };
 
 
-exports.insertPlan = async function (connection, productId, planDate, targetQty) {
+exports.insertPlan = async function (connection, productId, planDate, dueDate, targetQty) {
     const Query = 
-    `INSERT INTO ProductPlan (productId, planDate, targetQty) VALUES (?, ?, ?);`;
-    const Params = [productId, planDate, targetQty];
+    `INSERT INTO ProductPlan (productId, planDate, dueDate, targetQty) VALUES (?, ?, ?, ?);`;
+    const Params = [productId, planDate, dueDate, targetQty];
 
     const [result] = await connection.query(Query, Params);
     return result;
