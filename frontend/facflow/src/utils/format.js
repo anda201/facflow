@@ -77,6 +77,19 @@ export function durationLabel(start, end) {
   return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
 }
 
+export function formatEstimatedHours(hoursValue) {
+  const total = Number(hoursValue) || 0;
+  let h = Math.floor(total);
+  let m = Math.round((total - h) * 60);
+  if (m === 60) {
+    h += 1;
+    m = 0;
+  }
+  if (h === 0) return `${m}분`;
+  if (m === 0) return `${h}시간`;
+  return `${h}시간 ${m}분`;
+}
+
 export function defectRateOf(good, defect) {
   const total = Number(good) + Number(defect);
   if (total === 0) return 0;

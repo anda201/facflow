@@ -9,16 +9,23 @@ import {
   Play,
   PlayCircle,
   Trash2,
+  Sparkles,
+  Clock,
 } from "lucide-react";
 import StatusBadge from "../common/StatusBadge";
 import { COLORS } from "../../constants/colors";
 import { PLAN_STATUS_META, EQUIP_META } from "../../constants/statusMeta";
-import { fmt, toKstDateInputValue, displayDate } from "../../utils/format";
+import { fmt, toKstDateInputValue, displayDate, formatEstimatedHours } from "../../utils/format";
 
-function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
+function PlanDetailCard({ plan, equipment, recommendation, onClose, onStart, onDelete }) {
   const [selectedEquip, setSelectedEquip] = useState(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const canDelete = plan.status === "WAIT";
+
+  const recommendedEquip =
+    recommendation && equipment.find((e) => e.equipmentId === recommendation.equipmentId);
+  const recommendedAvailable = recommendedEquip?.status === "IDLE";
+
 
   return (
     <div
@@ -129,6 +136,91 @@ function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
         <div style={{ padding: "18px 22px" }}>
           {plan.status === "WAIT" && (
             <>
+              {recommendedEquip && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 10,
+                    background: `${COLORS.amber}12`,
+                    border: `1px solid ${COLORS.amber}55`,
+                    borderRadius: 5,
+                    padding: "11px 12px",
+                    marginBottom: 16,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 5,
+                        background: `${COLORS.amber}20`,
+                        border: `1px solid ${COLORS.amber}55`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Sparkles size={15} color={COLORS.amber} />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: 9.5,
+                          color: COLORS.amber,
+                          letterSpacing: "0.08em",
+                          marginBottom: 2,
+                        }}
+                      >
+                        추천 설비
+                      </div>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: 15, fontWeight: 600 }}>
+                          {recommendedEquip.equipmentName}
+                        </span>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: 11,
+                            color: COLORS.muted,
+                          }}
+                        >
+                          <Clock size={11} />
+                          약 {formatEstimatedHours(recommendation.estimatedHours)} 소요
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={!recommendedAvailable}
+                    onClick={() => setSelectedEquip(recommendedEquip.equipmentId)}
+                    style={{
+                      flexShrink: 0,
+                      background: recommendedAvailable ? COLORS.amber : COLORS.panelAlt,
+                      border: `1px solid ${recommendedAvailable ? COLORS.amber : COLORS.hairline}`,
+                      color: recommendedAvailable ? "#1A1300" : COLORS.faint,
+                      borderRadius: 4,
+                      padding: "7px 12px",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      cursor: recommendedAvailable ? "pointer" : "not-allowed",
+                      fontFamily: "'Inter', sans-serif",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {recommendedAvailable ? "이 설비로 선택" : "사용중"}
+                  </button>
+                </div>
+              )}
+
               <div
                 style={{
                   display: "flex",
@@ -173,6 +265,7 @@ function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
                   const em = EQUIP_META[eq.status];
                   const disabled = eq.status !== "IDLE";
                   const selected = selectedEquip === eq.equipmentId;
+                  const isRecommended = recommendation?.equipmentId === eq.equipmentId;
                   return (
                     <button
                       key={eq.equipmentId}
@@ -184,7 +277,11 @@ function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
                         justifyContent: "space-between",
                         background: selected ? `${COLORS.amber}18` : COLORS.panelAlt,
                         border: `1px solid ${
-                          selected ? COLORS.amber : COLORS.hairline
+                          selected
+                            ? COLORS.amber
+                            : isRecommended
+                            ? `${COLORS.amber}70`
+                            : COLORS.hairline
                         }`,
                         borderRadius: 4,
                         padding: "8px 10px",
@@ -195,11 +292,15 @@ function PlanDetailCard({ plan, equipment, onClose, onStart, onDelete }) {
                     >
                       <span
                         style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 5,
                           fontFamily: "'JetBrains Mono', monospace",
                           fontSize: 12,
                           color: selected ? COLORS.amber : COLORS.text,
                         }}
                       >
+                        {isRecommended && <Sparkles size={10} color={COLORS.amber} />}
                         {eq.equipmentName}
                       </span>
                       <span

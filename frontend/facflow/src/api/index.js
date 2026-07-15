@@ -29,6 +29,11 @@ export const startPlan = async (planId, requestBody) => {
     return data.result;
   };
 
+export const getAvailableEquipment = async (planId) => {
+    const { data } = await axiosInstance.get(`/plan/${planId}/available-equipment`);
+    return data.result;
+  };
+
   // requestBody : "planDate"
 export const getProduction = async (params) => {
     const { data } = await axiosInstance.get("/production", { params });
@@ -45,8 +50,8 @@ export const getEquipment = async () => {
     return data.result;
   };
 
-export const getIdleEquipment = async () => {
-    const { data } = await axiosInstance.get("/idle-equipment");
+export const getIdleEquipment = async (params) => {
+    const { data } = await axiosInstance.get("/idle-equipment", { params });
     return data.result;
   };
 

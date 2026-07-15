@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getPlan, getIdleEquipment, createPlan, startPlan, getProducts } from "../api";
+import { getPlan, createPlan, startPlan, getProducts, getAvailableEquipment } from "../api";
 import {
   toKstDateInputValue,
 } from "../utils/format";
@@ -20,25 +20,6 @@ import {
   Plus,
   X,
 } from "lucide-react";
-
-
-// get products from /products API 구현 예정
-const PRODUCTS = [
-  { productId: 1, productCode: "P-001", productName: "자동차 브레이크 패드" },
-  { productId: 4, productCode: "P-004", productName: "기어 샤프트" },
-  { productId: 6, productCode: "P-006", productName: "모터 커버" },
-  { productId: 7, productCode: "P-007", productName: "배터리 프레임" },
-  { productId: 9, productCode: "P-009", productName: "센서 모듈" },
-  { productId: 10, productCode: "P-010", productName: "제어 보드" },
-  { productId: 11, productCode: "P-011", productName: "스틸 플레이트" },
-  { productId: 13, productCode: "P-013", productName: "유압 밸브" },
-  { productId: 14, productCode: "P-014", productName: "실린더 블록" },
-  { productId: 16, productCode: "P-016", productName: "로봇 암 조인트" },
-  { productId: 17, productCode: "P-017", productName: "반도체 장비 부품" },
-  { productId: 19, productCode: "P-019", productName: "산업용 컨트롤러" },
-  { productId: 20, productCode: "P-020", productName: "스마트 센서 키트" },
-];
-
 
 const EMPTY_SUMMARY = {
   totalPlans: 0,
@@ -65,18 +46,7 @@ export default function ProductionPlanDashboard() {
     const [error, setError] = useState(null);
     const [createError, setCreateError] = useState(null);
     const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-      const fetchEquipment = async () => {
-        try {
-          const equipmentData = await getIdleEquipment();
-          setEquipment(equipmentData ?? []);
-        } catch (e) {
-          setError(e);
-        }
-      };
-      fetchEquipment();
-    }, []);
+    const [recommendation, setRecommendation] = useState(null);
 
     useEffect(() => {
       const fetchProducts = async () => {
@@ -106,6 +76,33 @@ export default function ProductionPlanDashboard() {
       };
       fetchPlans();
     }, [selectedDate]);
+
+    useEffect(() => {
+      if (!activePlanId) {
+        setRecommendation(null);
+        setEquipment([]);
+        return;
+      }
+
+      const plan = plans.find((p) => p.planId === activePlanId);
+      if (!plan || plan.status !== "WAIT") {
+        setRecommendation(null);
+        setEquipment([]);
+        return;
+      }
+
+      const fetchPlanDetail = async () => {
+        try {
+          const result = await getAvailableEquipment(activePlanId);
+          setEquipment(result?.equipments ?? []);
+          setRecommendation(result?.recommendation ?? null);
+        } catch {
+          setEquipment([]);
+          setRecommendation(null);
+        }
+      };
+      fetchPlanDetail();
+    }, [activePlanId, plans]);
 
   const plansForDate = useMemo(() => {
     return plans
@@ -271,6 +268,7 @@ export default function ProductionPlanDashboard() {
         <PlanDetailCard
           plan={activePlan}
           equipment={equipment}
+          recommendation={recommendation}
           onClose={() => setActivePlanId(null)}
           onStart={handleStart}
           onDelete={handleDelete}
