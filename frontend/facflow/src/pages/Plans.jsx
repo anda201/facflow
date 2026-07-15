@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getPlan, getIdleEquipment, createPlan, startPlan } from "../api";
+import { getPlan, getIdleEquipment, createPlan, startPlan, getProducts } from "../api";
 import {
   toKstDateInputValue,
 } from "../utils/format";
@@ -64,6 +64,7 @@ export default function ProductionPlanDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [createError, setCreateError] = useState(null);
+    const [products, setProducts] = useState([]);
 
     useEffect(() => {
       const fetchEquipment = async () => {
@@ -75,6 +76,18 @@ export default function ProductionPlanDashboard() {
         }
       };
       fetchEquipment();
+    }, []);
+
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const productsData = await getProducts();
+          setProducts(productsData ?? []);
+        } catch (e) {
+          setError(e);
+        }
+      };
+      fetchProducts();
     }, []);
 
     useEffect(() => {
@@ -226,7 +239,7 @@ export default function ProductionPlanDashboard() {
       {/* Create form */}
       {showForm && (
         <CreatePlanForm
-          products={PRODUCTS}
+          products={products}
           defaultDate={selectedDate}
           serverError={createError}
           onCancel={() => {

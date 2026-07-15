@@ -49,3 +49,8 @@ export const getIdleEquipment = async () => {
     const { data } = await axiosInstance.get("/idle-equipment");
     return data.result;
   };
+
+export const getProducts = async () => {
+    const { data } = await axiosInstance.get("/product");
+    return data.result;
+  };

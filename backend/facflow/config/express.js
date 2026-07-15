@@ -26,11 +26,11 @@ module.exports = function () {
   // app.use(express.static(process.cwd() + '/public'));
 
   //직접 구현하는 모듈
-  require("../src/routes/indexRoute")(app);
   require("../src/routes/dashboardRoute")(app);
   require("../src/routes/planRoute")(app);
   require("../src/routes/productionRoute")(app);
   require("../src/routes/equipmentRoute")(app);
+  require("../src/routes/productRoute")(app);
 
   return app;
 };
