@@ -12,6 +12,8 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+
+    console.log("test fetchData : ", import.meta.env.VITE_API_URL);
     const fetchData = async () => {
       try {
         setLoading(true);
