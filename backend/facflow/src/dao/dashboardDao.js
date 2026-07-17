@@ -9,18 +9,15 @@ const { today } = require("../utils/date")
 // - selectProductChart() : 주간 제품별 생산량 차트
 // - selectWeeklyChart() : 주간 날짜별 생산량 추이 차트
 
-const DATE_SUB = today(); 
-
 exports.selectTodayProduction = async function (connection) {
   const Query = 
     `SELECT IFNULL(SUM(p.goodQty), 0) AS todayProduction 
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
     WHERE pp.planDate = ?;`;
-  const Params = [DATE_SUB];
+  const Params = [today()];
 
   const [rows] = await connection.query(Query, Params);
-  console.log(rows[0].todayProduction);
 
   return rows[0].todayProduction;
 };
@@ -37,7 +34,7 @@ exports.selectAchievementRate = async function (connection) {
     ON p.planId = pp.planId
     WHERE pp.planDate = ?;`;
 
-  const Params = [DATE_SUB];
+  const Params = [today()];
 
   const [rows] = await connection.query(Query, Params);
   return rows[0].achievementRate;
@@ -50,7 +47,7 @@ exports.selectTodayDefect = async function (connection) {
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
     WHERE pp.planDate = ?;`;
-  const Params = [DATE_SUB];
+  const Params = [today()];
   const [rows] = await connection.query(Query, Params);
 
   return rows[0].todayDefect;
@@ -62,7 +59,7 @@ exports.selectTodayDefectRate = async function (connection) {
     FROM Production p
     INNER JOIN ProductPlan pp ON p.planId = pp.planId
     WHERE pp.planDate = ?;`;
-  const Params = [DATE_SUB];
+  const Params = [today()];
 
   const [rows] = await connection.query(Query, Params);
   return rows[0].todayDefectRate;
