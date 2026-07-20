@@ -3,10 +3,11 @@ const { logger } = require("../../config/winston");
 
 const equipmentDao = require("../dao/equipmentDao");
 
-const EMPTY_EQUIPMENT_STATS = {
+const EMPTY_EQUIPMENT_DETAIL = {
   productionQty: 0,
   defectQty: 0,
   defectRate: 0,
+  products: [],
 };
 
 exports.getEquipment = async function () {
@@ -95,8 +96,15 @@ exports.getEquipmentDetail = async function (equipmentId) {
   }
 
   try {
-    const result = await equipmentDao.getEquipmentDetail(connection, equipmentId);
-    return result ?? EMPTY_EQUIPMENT_STATS;
+    const [stats, products] = await Promise.all([
+      equipmentDao.getEquipmentDetail(connection, equipmentId),
+      equipmentDao.selectEquipmentProducts(connection, equipmentId),
+    ]);
+
+    return {
+      ...(stats ?? EMPTY_EQUIPMENT_DETAIL),
+      products,
+    };
   } catch (err) {
     logger.error(`getEquipmentDetail DB Query error\n: ${JSON.stringify(err)}`);
     throw err;

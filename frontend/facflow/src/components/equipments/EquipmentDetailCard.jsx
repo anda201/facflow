@@ -1,38 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { X, ShieldAlert, PackageCheck, AlertTriangle, Gauge } from "lucide-react";
+import { X, ShieldAlert, PackageCheck, AlertTriangle, Gauge, Package } from "lucide-react";
 import { StatusBadge } from "../common";
 import { EQUIP_META } from "../../constants/statusMeta";
 import { COLORS } from "../../constants/colors";
 import { fmt, fmtPct, kstDateLabel } from "../../utils/format";
 import { getEquipmentDetail } from "../../api";
 
-const EMPTY_STATS = {
+const EMPTY_DETAIL = {
   productionQty: 0,
   defectQty: 0,
   defectRate: 0,
+  products: [],
 };
 
 function EquipmentDetailCard({ eq, onClose, onSetStop }) {
-  const [stats, setStats] = useState(EMPTY_STATS);
-  const [statsLoading, setStatsLoading] = useState(true);
-  const [statsError, setStatsError] = useState(null);
+  const [detail, setDetail] = useState(EMPTY_DETAIL);
+  const [detailLoading, setDetailLoading] = useState(true);
+  const [detailError, setDetailError] = useState(null);
   const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchDetail = async () => {
       try {
-        setStatsLoading(true);
-        setStatsError(null);
+        setDetailLoading(true);
+        setDetailError(null);
         const result = await getEquipmentDetail(eq.equipmentId);
-        setStats(result ?? EMPTY_STATS);
+        setDetail({
+          productionQty: result?.productionQty ?? 0,
+          defectQty: result?.defectQty ?? 0,
+          defectRate: result?.defectRate ?? 0,
+          products: result?.products ?? [],
+        });
       } catch (e) {
-        setStatsError(e);
-        setStats(EMPTY_STATS);
+        setDetailError(e);
+        setDetail(EMPTY_DETAIL);
       } finally {
-        setStatsLoading(false);
+        setDetailLoading(false);
       }
     };
-    fetchStats();
+    fetchDetail();
   }, [eq.equipmentId]);
 
   function handleStopClick() {
@@ -132,7 +138,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
             최근 30일 생산 실적
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {statsLoading ? (
+            {detailLoading ? (
               <div
                 style={{
                   gridColumn: "1 / -1",
@@ -144,7 +150,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
               >
                 생산 실적 불러오는 중...
               </div>
-            ) : statsError ? (
+            ) : detailError ? (
               <div
                 style={{
                   gridColumn: "1 / -1",
@@ -158,13 +164,13 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
               </div>
             ) : (
               [
-                { label: "생산수", value: fmt(stats.productionQty), unit: "EA", color: COLORS.text, Icon: PackageCheck },
-                { label: "불량수", value: fmt(stats.defectQty), unit: "EA", color: COLORS.red, Icon: AlertTriangle },
+                { label: "생산수", value: fmt(detail.productionQty), unit: "EA", color: COLORS.text, Icon: PackageCheck },
+                { label: "불량수", value: fmt(detail.defectQty), unit: "EA", color: COLORS.red, Icon: AlertTriangle },
                 {
                   label: "불량률",
-                  value: fmtPct(stats.defectRate, 2),
+                  value: fmtPct(detail.defectRate, 2),
                   unit: "%",
-                  color: stats.defectRate > 5 ? COLORS.red : COLORS.amber,
+                  color: detail.defectRate > 5 ? COLORS.red : COLORS.amber,
                   Icon: Gauge,
                 },
               ].map((s) => (
@@ -182,12 +188,12 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
                     <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: 17, fontWeight: 600, color: s.color }}>
                       {s.value}
                     </span>
-                    <span style={{ fontSize: 10.5, color: COLORS.faint }}>{s.unit}</span>
+                    <span style={{ fontSize: 11, color: COLORS.faint }}>{s.unit}</span>
                   </div>
                   <div
                     style={{
                       fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 10,
+                      fontSize: 11,
                       color: COLORS.faint,
                       marginTop: 3,
                     }}
@@ -198,6 +204,95 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
               ))
             )}
           </div>
+        </div>
+
+        <div style={{ padding: "18px 22px", borderBottom: `1px solid ${COLORS.hairline}` }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              marginBottom: 12,
+            }}
+          >
+            <Package size={14} color={COLORS.blue} />
+            <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: 14, fontWeight: 600 }}>
+              생산 가능 제품
+            </div>
+          </div>
+
+          {detailLoading ? (
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                color: COLORS.faint,
+                padding: "4px 0",
+              }}
+            >
+              제품 목록 불러오는 중...
+            </div>
+          ) : detailError ? (
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                color: COLORS.red,
+                padding: "4px 0",
+              }}
+            >
+              제품 목록을 불러오지 못했습니다.
+            </div>
+          ) : detail.products.length === 0 ? (
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                color: COLORS.faint,
+                padding: "4px 0",
+              }}
+            >
+              등록된 생산 가능 제품이 없습니다.
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 180, overflowY: "auto" }}>
+              {detail.products.map((product) => (
+                <div
+                  key={product.productId}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 10,
+                    background: COLORS.panelAlt,
+                    border: `1px solid ${COLORS.hairline}`,
+                    borderRadius: 4,
+                    padding: "10px 12px",
+                  }}
+                >
+                  <div style={{ minWidth: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}>
+                    <div style={{ fontSize: 11, color: COLORS.muted }}>{product.productCode}</div>
+                    <div style={{ fontSize: 14, color: COLORS.text }}>{product.productName}</div>
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 11,
+                      color: COLORS.muted,
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {fmt(product.hourlyCapacity)} EA/h
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div style={{ padding: "18px 22px" }}>

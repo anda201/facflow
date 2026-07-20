@@ -275,6 +275,7 @@ function PlanDetailCard({ plan, equipment, recommendation, onClose, onStart, onD
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
+                        gap: 8,
                         background: selected ? `${COLORS.amber}18` : COLORS.panelAlt,
                         border: `1px solid ${
                           selected
@@ -290,19 +291,35 @@ function PlanDetailCard({ plan, equipment, recommendation, onClose, onStart, onD
                         textAlign: "left",
                       }}
                     >
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 5,
-                          fontFamily: "'JetBrains Mono', monospace",
-                          fontSize: 12,
-                          color: selected ? COLORS.amber : COLORS.text,
-                        }}
-                      >
-                        {isRecommended && <Sparkles size={10} color={COLORS.amber} />}
-                        {eq.equipmentName}
-                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: 13,
+                            color: selected ? COLORS.amber : COLORS.text,
+                          }}
+                        >
+                          {isRecommended && <Sparkles size={10} color={COLORS.amber} />}
+                          {eq.equipmentName}
+                        </span>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            marginTop: 4,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: 11,
+                            color: COLORS.muted,
+                          }}
+                        >
+                          <Clock size={10} />
+                          약 {formatEstimatedHours(eq.estimatedHours)} 소요
+                        </span>
+                      </div>
                       <span
                         style={{
                           display: "flex",
@@ -311,6 +328,7 @@ function PlanDetailCard({ plan, equipment, recommendation, onClose, onStart, onD
                           fontSize: 10,
                           color: em.color,
                           fontFamily: "'JetBrains Mono', monospace",
+                          flexShrink: 0,
                         }}
                       >
                         <CircleDot size={9} />

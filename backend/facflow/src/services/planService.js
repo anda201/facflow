@@ -136,14 +136,22 @@ exports.getAvailableEquipment = async function (planId) {
     }
 
     try {
-        const [equipments, recommendationRows] = await Promise.all([
-            planDao.selectIdleEquipmentByPlanId(connection, planId),
-            planDao.recommendEquipment(connection, planId),
-        ]);
+        const equipments = await planDao.selectIdleEquipmentByPlanId(connection, planId);
+        const recommendation = equipments.reduce((best, eq) => {
+            if (!best || Number(eq.estimatedHours) < Number(best.estimatedHours)) {
+                return eq;
+            }
+            return best;
+        }, null);
 
         return {
             equipments,
-            recommendation: recommendationRows[0] ?? null,
+            recommendation: recommendation
+                ? {
+                    equipmentId: recommendation.equipmentId,
+                    estimatedHours: recommendation.estimatedHours,
+                }
+                : null,
         };
     } catch (err) {
         logger.error(`getAvailableEquipment DB Query error\n: ${JSON.stringify(err)}`);

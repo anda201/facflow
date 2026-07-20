@@ -75,3 +75,20 @@ exports.getEquipmentDetail = async function (connection, equipmentId) {
   const [rows] = await connection.query(Query, Params);
   return rows[0];
 };
+
+exports.selectEquipmentProducts = async function (connection, equipmentId) {
+  const Query = `
+    SELECT
+      p.productId,
+      p.productCode,
+      p.productName,
+      epp.hourlyCapacity
+    FROM EquipmentProduct epp
+    INNER JOIN Product p ON p.productId = epp.productId
+    WHERE epp.equipmentId = ?
+    ORDER BY p.productCode ASC;`;
+  const Params = [equipmentId];
+
+  const [rows] = await connection.query(Query, Params);
+  return rows;
+};
