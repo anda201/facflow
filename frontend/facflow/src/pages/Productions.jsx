@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { ProductionDetailCard, ProductionTable } from "../components/productions";
-import { SummaryChip, PageHeader, HeaderBadge, DateStatusToolbar } from "../components/common";
+import { SummaryChip, PageHeader, HeaderBadge, DateStatusToolbar, DelayAlertSection } from "../components/common";
 import { PRODUCTION_STATUS_FILTERS } from "../constants/statusMeta";
 import { COLORS } from "../constants/colors";
+import { splitByDelaySeverity } from "../utils/delay";
 import {
   fmt,
   fmtPct,
@@ -14,6 +15,7 @@ import {
   CheckCircle2,
   PackageCheck,
   AlertTriangle,
+  Clock,
 } from "lucide-react";
 import { getProduction, endProduction } from "../api";
 
@@ -31,6 +33,7 @@ const EMPTY_SUMMARY = {
 // ---------------------------------------------------------------------------
 export default function ProductionPerformanceDashboard() {
   const [productions, setProductions] = useState([]);
+  const [overdueProductions, setOverdueProductions] = useState([]);
   const [summary, setSummary] = useState(EMPTY_SUMMARY);
   const [selectedDate, setSelectedDate] = useState(
     toKstDateInputValue(new Date().toISOString())
@@ -48,6 +51,7 @@ export default function ProductionPerformanceDashboard() {
         setError(null);
         const result = await getProduction({ productionDate: selectedDate });
         setProductions(result.productions ?? []);
+        setOverdueProductions(result.overdueProductions ?? []);
         setSummary(result.summary ?? EMPTY_SUMMARY);
       } catch (e) {
         setError(e);
@@ -59,14 +63,32 @@ export default function ProductionPerformanceDashboard() {
   }, [selectedDate]);
 
   const productionsForDate = useMemo(() => {
+    const overdueIds = new Set(overdueProductions.map((p) => p.productionId));
     return productions
+      .filter((p) => !overdueIds.has(p.productionId))
       .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
       .sort((a, b) => b.productionId - a.productionId);
-  }, [productions, statusFilter]);
+  }, [productions, overdueProductions, statusFilter]);
 
-  const runningCount = productions.filter((p) => p.status === "RUN").length;
+  const overdueProductionsForView = useMemo(() => {
+    return overdueProductions
+      .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
+      .sort((a, b) => a.planDate.localeCompare(b.planDate) || b.productionId - a.productionId);
+  }, [overdueProductions, statusFilter]);
+
+  const { startDelayed: startDelayedProductions, dueOverdue: dueOverdueProductions } = useMemo(
+    () => splitByDelaySeverity(overdueProductionsForView),
+    [overdueProductionsForView]
+  );
+
+  const delaySummary = useMemo(
+    () => splitByDelaySeverity(overdueProductions),
+    [overdueProductions]
+  );
+
+  const runningCount = [...overdueProductions, ...productions].filter((p) => p.status === "RUN").length;
   const activeProduction =
-    productions.find((p) => p.productionId === activeProductionId) ?? null;
+    [...overdueProductions, ...productions].find((p) => p.productionId === activeProductionId) ?? null;
 
   async function handleComplete(productionId) {
     try {
@@ -84,6 +106,7 @@ export default function ProductionPerformanceDashboard() {
             : p
         )
       );
+      setOverdueProductions((prev) => prev.filter((p) => p.productionId !== productionId));
       setActiveProductionId(null);
       setFlashId(productionId);
       setTimeout(() => setFlashId(null), 2200);
@@ -109,6 +132,8 @@ export default function ProductionPerformanceDashboard() {
         @keyframes flashRow { 0% { background: rgba(61,220,132,0.18); } 100% { background: transparent; } }
         tr.perf-row:hover { background: rgba(255,255,255,0.025); }
         tr.perf-row--clickable:hover { cursor: pointer; }
+        tr.perf-row-delay-critical:hover { background: rgba(255,90,90,0.06); }
+        tr.perf-row-delay-warning:hover { background: rgba(245,166,35,0.08); }
       `}</style>
 
       <PageHeader
@@ -127,14 +152,47 @@ export default function ProductionPerformanceDashboard() {
         <SummaryChip label="양품 수량" value={fmt(summary.totalGoodQty)} unit="EA" color={COLORS.green} Icon={CheckCircle2} />
         <SummaryChip label="불량 수량" value={fmt(summary.totalDefectQty)} unit="EA" color={COLORS.red} Icon={AlertTriangle} />
         <SummaryChip label="총 생산 수량" value={fmt(summary.totalProductionQty)} unit="EA" color={COLORS.text} Icon={Factory} />
-        <SummaryChip
-          label="불량률"
-          value={fmtPct(summary.defectRate, 2)}
-          unit="%"
-          color={Number(summary.defectRate) > 5 ? COLORS.red : COLORS.amber}
-          Icon={Gauge}
-        />
+        <SummaryChip label="불량률" value={fmtPct(summary.defectRate, 2)} unit="%" color={Number(summary.defectRate) > 5 ? COLORS.red : COLORS.amber} Icon={Gauge} />
+        <SummaryChip label="착수 지연" value={delaySummary.startDelayed.length} unit="건" color={COLORS.amber} Icon={Clock} />
+        <SummaryChip label="납기 지연" value={delaySummary.dueOverdue.length} unit="건" color={COLORS.red} Icon={AlertTriangle} />
       </div>
+
+      {dueOverdueProductions.length > 0 && (
+        <DelayAlertSection
+          severity="critical"
+          count={dueOverdueProductions.length}
+          title="진행중 실적 (납기 지연)"
+        >
+          <ProductionTable
+            productions={dueOverdueProductions}
+            runningCount={dueOverdueProductions.filter((p) => p.status === "RUN").length}
+            flashId={flashId}
+            onRowClick={setActiveProductionId}
+            showPlanDate
+            showDueDate
+            borderRadius="4px"
+            variant="delay-critical"
+          />
+        </DelayAlertSection>
+      )}
+
+      {startDelayedProductions.length > 0 && (
+        <DelayAlertSection
+          severity="warning"
+          count={startDelayedProductions.length}
+          title="진행중 실적 (착수 지연)"
+        >
+          <ProductionTable
+            productions={startDelayedProductions}
+            runningCount={startDelayedProductions.filter((p) => p.status === "RUN").length}
+            flashId={flashId}
+            onRowClick={setActiveProductionId}
+            showPlanDate
+            borderRadius="4px"
+            variant="delay-warning"
+          />
+        </DelayAlertSection>
+      )}
 
       <DateStatusToolbar
         selectedDate={selectedDate}
@@ -147,7 +205,7 @@ export default function ProductionPerformanceDashboard() {
 
       <ProductionTable
         productions={productionsForDate}
-        runningCount={runningCount}
+        runningCount={productionsForDate.filter((p) => p.status === "RUN").length}
         flashId={flashId}
         onRowClick={setActiveProductionId}
       />

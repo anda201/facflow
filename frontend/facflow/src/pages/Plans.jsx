@@ -8,9 +8,10 @@ import {
   PlanDetailCard,
   PlanTable,
 } from "../components/plans";
-import { PageHeader, SummaryChip, DateStatusToolbar } from "../components/common";
+import { PageHeader, SummaryChip, DateStatusToolbar, DelayAlertSection } from "../components/common";
 import { COLORS } from "../constants/colors";
 import { PLAN_STATUS_FILTERS } from "../constants/statusMeta";
+import { splitByDelaySeverity } from "../utils/delay";
 import {
   Clock,
   PlayCircle,
@@ -18,6 +19,7 @@ import {
   Ban,
   ListTodo,
   Plus,
+  AlertTriangle,
   X,
 } from "lucide-react";
 
@@ -41,6 +43,7 @@ export default function ProductionPlanDashboard() {
     
     const [equipment, setEquipment] = useState([]);
     const [plans, setPlans] = useState([]);
+    const [overduePlans, setOverduePlans] = useState([]);
     const [summary, setSummary] = useState(EMPTY_SUMMARY);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -67,6 +70,7 @@ export default function ProductionPlanDashboard() {
           setError(null);
           const result = await getPlan({ planDate: selectedDate });
           setPlans(result.plans ?? []);
+          setOverduePlans(result.overduePlans ?? []);
           setSummary(result.summary ?? EMPTY_SUMMARY);
         } catch (e) {
           setError(e);
@@ -84,7 +88,7 @@ export default function ProductionPlanDashboard() {
         return;
       }
 
-      const plan = plans.find((p) => p.planId === activePlanId);
+      const plan = [...overduePlans, ...plans].find((p) => p.planId === activePlanId);
       if (!plan || plan.status !== "WAIT") {
         setRecommendation(null);
         setEquipment([]);
@@ -102,13 +106,31 @@ export default function ProductionPlanDashboard() {
         }
       };
       fetchPlanDetail();
-    }, [activePlanId, plans]);
+    }, [activePlanId, plans, overduePlans]);
+
+  const overduePlansForView = useMemo(() => {
+    return overduePlans
+      .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
+      .sort((a, b) => a.planDate.localeCompare(b.planDate) || b.planId - a.planId);
+  }, [overduePlans, statusFilter]);
+
+  const { startDelayed: startDelayedPlans, dueOverdue: dueOverduePlans } = useMemo(
+    () => splitByDelaySeverity(overduePlansForView),
+    [overduePlansForView]
+  );
+
+  const delaySummary = useMemo(
+    () => splitByDelaySeverity(overduePlans),
+    [overduePlans]
+  );
 
   const plansForDate = useMemo(() => {
+    const overdueIds = new Set(overduePlans.map((p) => p.planId));
     return plans
+      .filter((p) => !overdueIds.has(p.planId))
       .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
       .sort((a, b) => b.planId - a.planId);
-  }, [plans, statusFilter]);
+  }, [plans, overduePlans, statusFilter]);
 
   if (loading) {
     return <div className="dashboard">로딩 중...</div>;
@@ -119,7 +141,9 @@ export default function ProductionPlanDashboard() {
   }
 
   const dateTargetTotal = plansForDate.reduce((s, p) => s + p.targetQty, 0);
-  const activePlan = plans.find((p) => p.planId === activePlanId) || null;
+  const dueOverdueTargetTotal = dueOverduePlans.reduce((s, p) => s + p.targetQty, 0);
+  const startDelayedTargetTotal = startDelayedPlans.reduce((s, p) => s + p.targetQty, 0);
+  const activePlan = [...overduePlans, ...plans].find((p) => p.planId === activePlanId) || null;
 
 
   async function handleCreate(form) {
@@ -142,6 +166,7 @@ export default function ProductionPlanDashboard() {
       if (!dateChanged) {
         const result = await getPlan({ planDate: form.planDate });
         setPlans(result.plans ?? []);
+        setOverduePlans(result.overduePlans ?? []);
         setSummary(result.summary ?? EMPTY_SUMMARY);
       }
 
@@ -160,16 +185,24 @@ export default function ProductionPlanDashboard() {
 
     try {
       const response = await startPlan(planId, requestBody);
+      const target = [...overduePlans, ...plans].find((p) => p.planId === planId);
       setPlans((prev) =>
         prev.map((p) =>
           p.planId === planId ? { ...p, status: "RUN", equipmentId } : p
         )
       );
-      setSummary((prev) => ({
-        ...prev,
-        waitPlans: prev.waitPlans - 1,
-        runningPlans: prev.runningPlans + 1,
-      }));
+      setOverduePlans((prev) =>
+        prev.map((p) =>
+          p.planId === planId ? { ...p, status: "RUN", equipmentId } : p
+        )
+      );
+      if (target?.planDate === selectedDate) {
+        setSummary((prev) => ({
+          ...prev,
+          waitPlans: prev.waitPlans - 1,
+          runningPlans: prev.runningPlans + 1,
+        }));
+      }
       setEquipment((prev) =>
         prev.map((e) =>
           e.equipmentId === equipmentId ? { ...e, status: "RUN" } : e
@@ -185,9 +218,10 @@ export default function ProductionPlanDashboard() {
 
 // 구현 예정
   function handleDelete(planId) {
-    const target = plans.find((p) => p.planId === planId);
+    const target = [...overduePlans, ...plans].find((p) => p.planId === planId);
     setPlans((prev) => prev.filter((p) => p.planId !== planId));
-    if (target?.status === "WAIT") {
+    setOverduePlans((prev) => prev.filter((p) => p.planId !== planId));
+    if (target?.status === "WAIT" && target.planDate === selectedDate) {
       setSummary((prev) => ({
         ...prev,
         totalPlans: prev.totalPlans - 1,
@@ -211,6 +245,8 @@ export default function ProductionPlanDashboard() {
         select { cursor: pointer; }
         @keyframes flashRow { 0% { background: rgba(245,166,35,0.22); } 100% { background: transparent; } }
         tr.plan-row:hover { background: rgba(255,255,255,0.025); cursor: pointer; }
+        tr.plan-row-delay-critical:hover { background: rgba(255,90,90,0.06); }
+        tr.plan-row-delay-warning:hover { background: rgba(245,166,35,0.08); }
       `}</style>
 
       <PageHeader title="생산 계획 관리" subtitle="PLAN MANAGER" icon={ListTodo}>
@@ -240,11 +276,13 @@ export default function ProductionPlanDashboard() {
       </PageHeader>
       {/* Summary strip */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <SummaryChip label="전체 계획" value={summary.totalPlans} color={COLORS.blue} Icon={ListTodo} />
-        <SummaryChip label="대기" value={summary.waitPlans} color={COLORS.muted} Icon={Clock} />
-        <SummaryChip label="진행중" value={summary.runningPlans} color={COLORS.amber} Icon={PlayCircle} />
-        <SummaryChip label="완료" value={summary.completedPlans} color={COLORS.green} Icon={CheckCircle2} />
-        <SummaryChip label="취소" value={summary.canceledPlans} color={COLORS.red} Icon={Ban} />
+        <SummaryChip label="전체 계획" unit="건" value={summary.totalPlans} color={COLORS.blue} Icon={ListTodo} />
+        <SummaryChip label="대기" unit="건" unit="건" value={summary.waitPlans} color={COLORS.muted} Icon={Clock} />
+        <SummaryChip label="진행중" unit="건" value={summary.runningPlans} color={COLORS.amber} Icon={PlayCircle} />
+        <SummaryChip label="완료" unit="건" value={summary.completedPlans} color={COLORS.green} Icon={CheckCircle2} />
+        <SummaryChip label="취소" unit="건" value={summary.canceledPlans} color={COLORS.red} Icon={Ban} />
+        <SummaryChip label="착수 지연" unit="건" value={delaySummary.startDelayed.length} color={COLORS.amber} Icon={Clock} />
+        <SummaryChip label="납기 지연" unit="건" value={delaySummary.dueOverdue.length} color={COLORS.red} Icon={AlertTriangle} />
       </div>
 
       {/* Create form */}
@@ -259,6 +297,43 @@ export default function ProductionPlanDashboard() {
           }}
           onCreate={handleCreate}
         />
+      )}
+
+      {dueOverduePlans.length > 0 && (
+        <DelayAlertSection
+          severity="critical"
+          count={dueOverduePlans.length}
+          title="미처리 계획 (납기 지연)"
+        >
+          <PlanTable
+            plans={dueOverduePlans}
+            dateTargetTotal={dueOverdueTargetTotal}
+            flashId={flashId}
+            onRowClick={setActivePlanId}
+            showPlanDate
+            showDueDate
+            borderRadius="4px"
+            variant="delay-critical"
+          />
+        </DelayAlertSection>
+      )}
+
+      {startDelayedPlans.length > 0 && (
+        <DelayAlertSection
+          severity="warning"
+          count={startDelayedPlans.length}
+          title="미처리 계획 (착수 지연)"
+        >
+          <PlanTable
+            plans={startDelayedPlans}
+            dateTargetTotal={startDelayedTargetTotal}
+            flashId={flashId}
+            onRowClick={setActivePlanId}
+            showPlanDate
+            borderRadius="4px"
+            variant="delay-warning"
+          />
+        </DelayAlertSection>
       )}
 
       <DateStatusToolbar

@@ -21,12 +21,16 @@ exports.getPlan = async function (planDate) {
   }
 
   try {
-    const summary = await planDao.selectPlanSummary(connection, date);
-    const plans = await planDao.selectPlanList(connection, date);
+    const [summary, plans, overduePlans] = await Promise.all([
+      planDao.selectPlanSummary(connection, date),
+      planDao.selectPlanList(connection, date),
+      planDao.selectOverduePlanList(connection),
+    ]);
 
     return {
       summary: summary[0],
       plans,
+      overduePlans,
     };
 
   } catch (err) {

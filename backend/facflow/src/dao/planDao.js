@@ -1,4 +1,5 @@
 const { pool } = require("../../config/database");
+const { today } = require("../utils/date");
 
 // - selectPlanSummary() : 생산 계획 현황 요약 데이터
 // - selectPlanList() : 생산 계획 목록 데이터
@@ -35,6 +36,29 @@ exports.selectPlanList = async function (connection, planDate) {
         WHERE pp.planDate = ?
         ORDER BY pp.createdAt DESC;`;
     const Params = [planDate];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows;
+};
+
+exports.selectOverduePlanList = async function (connection) {
+    const Query =
+        `SELECT
+            pp.planId,
+            pp.productId,
+            prod.productCode,
+            prod.productName,
+            pp.planDate,
+            pp.dueDate,
+            pp.targetQty,
+            pp.status,
+            pp.createdAt
+        FROM ProductPlan pp
+        INNER JOIN Product prod ON pp.productId = prod.productId
+        WHERE pp.planDate < ?
+          AND pp.status IN ('WAIT', 'RUN')
+        ORDER BY pp.planDate ASC, pp.createdAt DESC;`;
+    const Params = [today()];
 
     const [rows] = await connection.query(Query, Params);
     return rows;

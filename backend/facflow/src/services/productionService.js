@@ -22,12 +22,16 @@ exports.getProduction = async function (productionDate) {
   }
 
   try {
-    const summary = await productionDao.selectProductionSummary(connection, date);
-    const productions = await productionDao.selectProductionList(connection, date);
+    const [summary, productions, overdueProductions] = await Promise.all([
+      productionDao.selectProductionSummary(connection, date),
+      productionDao.selectProductionList(connection, date),
+      productionDao.selectOverdueProductionList(connection),
+    ]);
 
     return {
       summary: summary[0],
       productions,
+      overdueProductions,
     };
 
   } catch (err) {

@@ -5,3 +5,5 @@ export { default as Navbar } from "./Navbar";
 export { default as PageHeader } from "./PageHeader";
 export { default as SummaryChip } from "./SummaryChip";
 export { default as StatusBadge } from "./StatusBadge";
+export { default as DelayAlertSection } from "./DelayAlertSection";
+export { default as DelayBadge } from "./DelayBadge";
