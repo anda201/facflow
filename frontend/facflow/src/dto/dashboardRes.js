@@ -14,7 +14,7 @@ const weeklyChartRes = {
 // 대시보드 응답 데이터
 export const dashboardRes = {
     todayProduction: 0,        // 오늘 총 생산량 (Production.goodQty 합계)
-    achievementRate: 0,        // 생산 달성률 (실제 생산량 / 생산 목표량 * 100)
+    achievementRate: 0,        // 생산 달성률 (오늘·지연 계획 실제 생산량 / 목표량 * 100)
     todayDefect: 0,            // 오늘 불량 수량 (Production.defectQty 합계)
     todayDefectRate: 0,
     equipmentUtilization: 0,   // 설비 가동률 (가동 설비 수 / 전체 설비 수 * 100)
