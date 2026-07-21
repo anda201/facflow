@@ -159,11 +159,6 @@ function ProductionTable({
                       meta={PRODUCTION_STATUS_META}
                       fallback="DONE"
                     />
-                    {p.status === "HALT" && p.remainingQty != null && (
-                      <div className="text-table-remaining-sub" style={{ marginTop: 4 }}>
-                        잔량 {fmt(p.remainingQty)} EA
-                      </div>
-                    )}
                   </td>
                   <td style={{ padding: "10px 14px", textAlign: "right", color: COLORS.faint }}>
                     {p.status === "RUN" ? <ChevronRight size={15} /> : null}
