@@ -3,16 +3,7 @@
 
 import React from "react";
 import { fmt } from "../../utils/format";
-
-const COLORS = {
-  panel: "#1B1F26",
-  panelAlt: "#20242C",
-  hairline: "#2B313B",
-  amber: "#F5A623",
-  text: "#EDEFF2",
-  muted: "#8A93A3",
-  faint: "#565E6B",
-};
+import { COLORS } from "../../constants/colors";
 
 function ProductRanking({ productChart }) {
   const maxProduct = Math.max(...productChart.map((p) => p.productionQty));
@@ -34,58 +25,20 @@ function ProductRanking({ productChart }) {
           marginBottom: 14,
         }}
       >
-        <div
-          style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: 15,
-            fontWeight: 600,
-          }}
-        >
-          품목별 생산 순위
-        </div>
-        <div
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 11,
-            color: COLORS.muted,
-          }}
-        >
-          TOP 5
-        </div>
+        <div className="text-section-title">품목별 생산 순위</div>
+        <div className="text-chart-label">TOP 5</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {productChart.map((p, i) => (
           <div key={p.productId}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: 12.5,
-                marginBottom: 5,
-              }}
-            >
+            <div className="text-ranking-item" style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
               <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: i === 0 ? COLORS.amber : COLORS.faint,
-                    fontSize: 11,
-                    width: 16,
-                    display: "inline-block",
-                  }}
-                >
+                <span className={`text-ranking-rank${i === 0 ? " is-top" : ""}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span style={{ color: COLORS.text }}>{p.productName}</span>
+                <span>{p.productName}</span>
               </span>
-              <span
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  color: COLORS.muted,
-                }}
-              >
-                {fmt(p.productionQty)}
-              </span>
+              <span className="text-ranking-qty">{fmt(p.productionQty)}</span>
             </div>
             <div
               style={{

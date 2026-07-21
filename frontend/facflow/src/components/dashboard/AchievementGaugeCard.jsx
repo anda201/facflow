@@ -4,13 +4,7 @@
 import React from "react";
 import AchievementGauge from "./AchievementGauge";
 import { fmtPct } from "../../utils/format";
-
-const COLORS = {
-  panel: "#1B1F26",
-  hairline: "#2B313B",
-  red: "#E5484D",
-  muted: "#8A93A3",
-};
+import { COLORS } from "../../constants/colors";
 
 function AchievementGaugeCard({ value }) {
   return (
@@ -26,30 +20,15 @@ function AchievementGaugeCard({ value }) {
       }}
     >
       <div
-        style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 11,
-          letterSpacing: "0.08em",
-          color: COLORS.muted,
-          textTransform: "uppercase",
-          marginBottom: 4,
-        }}
+        className="text-kpi-label"
+        style={{ letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}
       >
         목표 달성률
       </div>
       <div style={{ flex: 1, minHeight: 120 }}>
         <AchievementGauge value={value} />
       </div>
-      <div
-        style={{
-          textAlign: "center",
-          fontFamily: "'Oswald', sans-serif",
-          fontSize: 28,
-          fontWeight: 600,
-          marginTop: -18,
-          color: COLORS.red,
-        }}
-      >
+      <div className="text-gauge-value" style={{ textAlign: "center", marginTop: -18, color: COLORS.red }}>
         {fmtPct(value, 1)}%
       </div>
     </div>

@@ -5,12 +5,6 @@ import { fmt } from "../../utils/format";
 import { getPlanQtyContext, getRecommendedEquipment } from "./planDetailHelpers";
 import PlanEquipmentSection from "./PlanEquipmentSection";
 
-const btnBase = {
-  fontFamily: "'Inter', sans-serif",
-  borderRadius: 4,
-  cursor: "pointer",
-};
-
 /** 상태별 본문 + 액션 버튼 (DetailCard의 body) */
 export default function PlanDetailBody({
   plan,
@@ -42,8 +36,8 @@ export default function PlanDetailBody({
         <button
           disabled={!selectedEquip}
           onClick={() => onStart(plan.planId, selectedEquip)}
+          className="text-btn-action"
           style={{
-            ...btnBase,
             width: "100%",
             display: "flex",
             alignItems: "center",
@@ -51,10 +45,9 @@ export default function PlanDetailBody({
             gap: 7,
             background: selectedEquip ? COLORS.amber : COLORS.panelAlt,
             border: `1px solid ${selectedEquip ? COLORS.amber : COLORS.hairline}`,
-            color: selectedEquip ? "#1A1300" : COLORS.faint,
+            color: selectedEquip ? "#1A1300" : "var(--color-faint)",
+            borderRadius: 4,
             padding: "11px 0",
-            fontSize: 13.5,
-            fontWeight: 600,
             cursor: selectedEquip ? "pointer" : "not-allowed",
           }}
         >
@@ -69,21 +62,19 @@ export default function PlanDetailBody({
     return (
       <>
         <div
+          className="text-notice"
           style={{
             background: `${COLORS.red}10`,
             border: `1px solid ${COLORS.red}44`,
             borderRadius: 4,
             padding: "12px 14px",
             marginBottom: 16,
-            fontSize: 12.5,
-            color: COLORS.text,
-            lineHeight: 1.55,
           }}
         >
           설비 점검으로 생산이 중단되었습니다.
           <br />
           목표 {fmt(plan.targetQty)} EA 중 {fmt(producedQty)} EA 생산 ·{" "}
-          <strong style={{ color: COLORS.red }}>잔량 {fmt(remainingQty)} EA</strong>
+          <strong style={{ color: "var(--color-red)" }}>잔량 {fmt(remainingQty)} EA</strong>
         </div>
         <PlanEquipmentSection
           equipment={equipment}
@@ -100,8 +91,8 @@ export default function PlanDetailBody({
         <button
           disabled={!selectedEquip || remainingQty <= 0}
           onClick={() => onResume(plan.planId, selectedEquip)}
+          className="text-btn-action"
           style={{
-            ...btnBase,
             width: "100%",
             display: "flex",
             alignItems: "center",
@@ -109,10 +100,9 @@ export default function PlanDetailBody({
             gap: 7,
             background: selectedEquip && remainingQty > 0 ? COLORS.amber : COLORS.panelAlt,
             border: `1px solid ${selectedEquip && remainingQty > 0 ? COLORS.amber : COLORS.hairline}`,
-            color: selectedEquip && remainingQty > 0 ? "#1A1300" : COLORS.faint,
+            color: selectedEquip && remainingQty > 0 ? "#1A1300" : "var(--color-faint)",
+            borderRadius: 4,
             padding: "11px 0",
-            fontSize: 13.5,
-            fontWeight: 600,
             cursor: selectedEquip && remainingQty > 0 ? "pointer" : "not-allowed",
           }}
         >
@@ -137,7 +127,7 @@ export default function PlanDetailBody({
         }}
       >
         <PlayCircle size={18} color={COLORS.amber} />
-        <div style={{ fontSize: 11.5, color: COLORS.muted }}>생산 중인 계획입니다.</div>
+        <div className="text-notice-muted">생산 중인 계획입니다.</div>
       </div>
     );
   }
@@ -145,9 +135,8 @@ export default function PlanDetailBody({
   if (plan.status === "DONE" || plan.status === "CANCEL") {
     return (
       <div
+        className="text-notice-faint"
         style={{
-          fontSize: 12.5,
-          color: COLORS.faint,
           background: COLORS.panelAlt,
           borderRadius: 4,
           padding: "12px 14px",

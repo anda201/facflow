@@ -103,24 +103,11 @@ export default function EquipmentStatusDashboard() {
         subtitle="EQUIPMENT · 실시간 설비 상태 조회"
         icon={Cog}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 11,
-            color: COLORS.muted,
-          }}
-        >
+        <div className="text-utilization-label" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           가동률
           <span
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: 16,
-              fontWeight: 600,
-              color: utilizationPct >= 50 ? COLORS.green : COLORS.amber,
-            }}
+            className="text-utilization-value"
+            style={{ color: utilizationPct >= 50 ? COLORS.green : COLORS.amber }}
           >
             {utilizationPct.toFixed(0)}%
           </span>
@@ -140,14 +127,7 @@ export default function EquipmentStatusDashboard() {
         ))}
       </div>
       {/* Equipment grid */}
-      <div
-        style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 11.5,
-          color: COLORS.muted,
-          marginBottom: 10,
-        }}
-      >
+      <div className="text-table-caption" style={{ marginBottom: 10 }}>
         {filtered.length}대 표시 중 · 카드를 클릭하면 상세 정보를 볼 수 있어요
       </div>
       <div

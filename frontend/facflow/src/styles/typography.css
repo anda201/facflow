@@ -1,0 +1,503 @@
+/*
+ * Typography tokens — sizes/colors/fonts are adjusted here only.
+ * COLORS in constants/colors.js should stay in sync for JS opacity usage.
+ */
+
+:root {
+  /* Text colors */
+  --color-text: #edeff2;
+  --color-muted: #8a93a3;
+  --color-faint: #565e6b;
+  --color-red: #e5484d;
+  --color-green: #3ddc84;
+  --color-amber: #f5a623;
+
+  /* Font families */
+  --font-family-sans: "Inter", sans-serif;
+  --font-family-mono: "JetBrains Mono", monospace;
+  --font-family-display: "Oswald", sans-serif;
+
+  /*
+   * Font sizes — adjust these to scale UI text globally.
+   * caption/small/meta/body/body-lg/large → tables, labels, buttons
+   * unit/stat/title/title-lg/page-title/hero/kpi → display & dashboard
+   */
+  --font-size-caption: 10px;
+  --font-size-small: 11px;
+  --font-size-meta: 12px;
+  --font-size-body: 13px;
+  --font-size-body-lg: 14px;
+  --font-size-large: 15px;
+  --font-size-unit: 16px;
+  --font-size-stat: 17px;
+  --font-size-title: 20px;
+  --font-size-title-lg: 21px;
+  --font-size-page-title: 22px;
+  --font-size-hero: 28px;
+  --font-size-kpi: 40px;
+}
+
+/* ── Table ── */
+.text-table-header {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  color: var(--color-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-table-caption {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+}
+
+.text-table-id {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  color: var(--color-faint);
+}
+
+.text-table-meta {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+}
+
+.text-table-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-table-qty {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-table-qty-good {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-green);
+}
+
+.text-table-qty-bad {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-red);
+}
+
+.text-table-rate {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+}
+
+.text-table-rate.is-high {
+  color: var(--color-red);
+}
+
+.text-table-date {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  color: var(--color-faint);
+}
+
+.text-table-empty {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-faint);
+}
+
+.text-table-remaining {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-faint);
+}
+
+.text-table-remaining.is-halt {
+  color: var(--color-red);
+}
+
+.text-table-remaining-sub {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-red);
+}
+
+/* ── Labels & body ── */
+.text-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+}
+
+.text-label-faint {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-faint);
+}
+
+.text-body-muted {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-muted);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-large);
+  color: var(--color-text);
+}
+
+.text-body-sm {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-accent-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-amber);
+  letter-spacing: 0.08em;
+}
+
+.text-equip-pick-name {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-equip-status {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-caption);
+}
+
+.text-ranking-rank {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-faint);
+  width: 16px;
+  display: inline-block;
+}
+
+.text-ranking-rank.is-top {
+  color: var(--color-amber);
+}
+
+.text-ranking-qty {
+  font-family: var(--font-family-mono);
+  color: var(--color-muted);
+}
+
+.text-body-semibold {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-large);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Buttons & inputs ── */
+.text-btn {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+}
+
+.text-btn-sm {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+}
+
+.text-btn-muted {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-muted);
+}
+
+.text-btn-action {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-large);
+  font-weight: 600;
+}
+
+.text-filter {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+}
+
+.text-input {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-toolbar-date {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-muted);
+}
+
+/* ── Badges & chips ── */
+.text-badge {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+}
+
+.text-delay-badge {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+}
+
+.text-chip-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+}
+
+.text-chip-unit {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+}
+
+.text-chip-value {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-page-title);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-header-badge {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+}
+
+/* ── Section / card / page ── */
+.text-label-uppercase {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-form-input {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-notice {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+.text-notice-muted {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+}
+
+.text-notice-faint {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-faint);
+}
+
+.text-info-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
+  color: var(--color-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-info-value {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-large);
+  color: var(--color-text);
+}
+
+.text-alert-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-large);
+  font-weight: 600;
+}
+
+.text-section-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-large);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-section-title-sm {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-body-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-card-meta {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-faint);
+}
+
+.text-card-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-title);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-card-title-lg {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-title-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-page-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-page-title);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-page-subtitle {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+/* ── Dashboard / KPI ── */
+.text-kpi-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+.text-kpi-value {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-kpi);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-kpi-unit {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-unit);
+  color: var(--color-muted);
+}
+
+.text-kpi-sub {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  color: var(--color-faint);
+}
+
+.text-gauge-value {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-hero);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-stat-value {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-stat);
+  font-weight: 600;
+}
+
+.text-stat-unit {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-meta);
+  color: var(--color-faint);
+}
+
+.text-stat-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-faint);
+}
+
+.text-chart-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+.text-ranking-item {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text);
+}
+
+.text-ranking-sub {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+/* ── Status ── */
+.text-error {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  color: var(--color-red);
+}
+
+.text-success {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  color: var(--color-green);
+}
+
+.text-equip-card-code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-caption);
+  color: var(--color-faint);
+  letter-spacing: 0.08em;
+}
+
+.text-equip-card-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-unit);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-equip-name {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.text-utilization-label {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+.text-utilization-value {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-unit);
+  font-weight: 600;
+}
+
+.text-equip-code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}
+
+.text-equip-hours {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-muted);
+}

@@ -1,5 +1,24 @@
 .layout {
     background: #14171C;
+    --dashboard-padding: 28px;
+    --navbar-height: 56px;
+    --dashboard-bg: #14171C;
+}
+
+.layout-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.page-header-sticky {
+    position: sticky;
+    top: var(--navbar-height);
+    z-index: 1020;
+    background: var(--dashboard-bg);
+    margin: calc(-1 * var(--dashboard-padding)) calc(-1 * var(--dashboard-padding)) 20px;
+    padding: var(--dashboard-padding) var(--dashboard-padding) 18px;
+    border-bottom: 1px solid #2B313B;
 }
 
 /* Dashboard */
@@ -8,8 +27,8 @@
     color: #EDEFF2;
     min-height: 100%;
     width: 100%;
-    font-family: "Inter", sans-serif;
-    padding: 28px;
+    font-family: var(--font-family-sans);
+    padding: var(--dashboard-padding);
     box-sizing: border-box;
 }
 

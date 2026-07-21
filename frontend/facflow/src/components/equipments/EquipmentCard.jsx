@@ -71,22 +71,12 @@ function EquipmentCard({ eq, onOpen }) {
         />
       </div>
 
-      <div
-        style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 9.5,
-          color: COLORS.faint,
-          letterSpacing: "0.08em",
-          marginBottom: 3,
-        }}
-      >
+      <div className="text-equip-card-code" style={{ marginBottom: 3 }}>
         EQ-{String(eq.equipmentId).padStart(3, "0")}
       </div>
       <div
+        className="text-equip-card-title"
         style={{
-          fontFamily: "'Oswald', sans-serif",
-          fontSize: 16,
-          fontWeight: 600,
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",

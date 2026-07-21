@@ -42,34 +42,14 @@ function SummaryChip({ label, value, unit, color, Icon, active, onClick }) {
       </div>
       <div style={{ minWidth: onClick ? 0 : undefined }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-          <span
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: 22,
-              fontWeight: 600,
-              lineHeight: 1,
-              color: COLORS.text,
-            }}
-          >
+          <span className="text-chip-value" style={{ lineHeight: 1 }}>
             {value}
           </span>
-          {unit && (
-            <span
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontSize: 12,
-                color: COLORS.muted,
-              }}
-            >
-              {unit}
-            </span>
-          )}
+          {unit && <span className="text-chip-unit">{unit}</span>}
         </div>
         <div
+          className="text-chip-label"
           style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 10.5,
-            color: COLORS.muted,
             marginTop: 3,
             letterSpacing: "0.04em",
             ...(onClick && {

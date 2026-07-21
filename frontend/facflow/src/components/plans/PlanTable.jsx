@@ -60,23 +60,11 @@ function PlanTable({
             borderBottom: `1px solid ${COLORS.hairline}`,
           }}
         >
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11.5,
-              color: COLORS.muted,
-            }}
-          >
+          <div className="text-table-caption">
             {countLabel ?? `${plans.length}건의 계획 · 행을 클릭하면 상세 정보를 볼 수 있어요`}
           </div>
           {dateTargetTotal != null && (
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11.5,
-                color: COLORS.muted,
-              }}
-            >
+            <div className="text-table-caption">
               목표 수량 합계 {fmt(dateTargetTotal)} EA
             </div>
           )}
@@ -84,14 +72,7 @@ function PlanTable({
       )}
 
       {plans.length === 0 ? (
-        <div
-          style={{
-            padding: "48px 20px",
-            textAlign: "center",
-            color: COLORS.faint,
-            fontSize: 13,
-          }}
-        >
+        <div className="text-table-empty" style={{ padding: "48px 20px", textAlign: "center" }}>
           {emptyMessage ?? (
             <>
               선택한 날짜에 등록된 생산 계획이 없습니다.
@@ -107,13 +88,9 @@ function PlanTable({
               {headers.map((h, i) => (
                 <th
                   key={h || "chev"}
+                  className="text-table-header"
                   style={{
                     textAlign: rightAlignCols.has(i) ? "right" : "left",
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10.5,
-                    color: COLORS.faint,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
                     padding: "10px 18px",
                     borderBottom: `1px solid ${COLORS.hairline}`,
                   }}
@@ -141,26 +118,11 @@ function PlanTable({
                     animation: flashId === p.planId ? "flashRow 2.2s ease-out" : "none",
                   }}
                 >
-                  <td
-                    style={{
-                      padding: "12px 18px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12,
-                      color: COLORS.faint,
-                    }}
-                  >
+                  <td className="text-table-id" style={{ padding: "12px 18px" }}>
                     #{p.planId}
                   </td>
                   {showPlanDate && (
-                    <td
-                      style={{
-                        padding: "12px 18px",
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11.5,
-                        color: COLORS.muted,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <td className="text-table-meta" style={{ padding: "12px 18px", whiteSpace: "nowrap" }}>
                       {displayDate(toKstDateInputValue(p.planDate))}
                       {!isCritical && startDelayDays > 0 && (
                         <DelayBadge
@@ -171,15 +133,7 @@ function PlanTable({
                     </td>
                   )}
                   {showDueDate && (
-                    <td
-                      style={{
-                        padding: "12px 18px",
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11.5,
-                        color: COLORS.muted,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <td className="text-table-meta" style={{ padding: "12px 18px", whiteSpace: "nowrap" }}>
                       {displayDate(toKstDateInputValue(p.dueDate))}
                       {dueDelayDays > 0 && (
                         <DelayBadge
@@ -189,36 +143,19 @@ function PlanTable({
                       )}
                     </td>
                   )}
-                  <td
-                    style={{
-                      padding: "12px 18px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12,
-                      color: COLORS.muted,
-                    }}
-                  >
+                  <td className="text-table-meta" style={{ padding: "12px 18px" }}>
                     {p.productCode}
                   </td>
-                  <td style={{ padding: "12px 18px", fontSize: 13 }}>{p.productName}</td>
-                  <td
-                    style={{
-                      padding: "12px 18px",
-                      textAlign: "right",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12.5,
-                    }}
-                  >
+                  <td className="text-table-body" style={{ padding: "12px 18px" }}>
+                    {p.productName}
+                  </td>
+                  <td className="text-table-qty" style={{ padding: "12px 18px", textAlign: "right" }}>
                     {fmt(p.targetQty)}
                   </td>
                   {showRemainingQty && (
                     <td
-                      style={{
-                        padding: "12px 18px",
-                        textAlign: "right",
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 12.5,
-                        color: p.status === "HALT" ? COLORS.red : COLORS.faint,
-                      }}
+                      className={`text-table-remaining${p.status === "HALT" ? " is-halt" : ""}`}
+                      style={{ padding: "12px 18px", textAlign: "right" }}
                     >
                       {p.remainingQty != null ? fmt(p.remainingQty) : "—"}
                     </td>
@@ -226,23 +163,10 @@ function PlanTable({
                   <td style={{ padding: "12px 18px" }}>
                     <StatusBadge status={p.status} meta={PLAN_STATUS_META} fallback="WAIT" />
                   </td>
-                  <td
-                    style={{
-                      padding: "12px 18px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 11.5,
-                      color: COLORS.faint,
-                    }}
-                  >
+                  <td className="text-table-date" style={{ padding: "12px 18px" }}>
                     {toKstDateInputValue(p.createdAt)}
                   </td>
-                  <td
-                    style={{
-                      padding: "12px 14px",
-                      textAlign: "right",
-                      color: COLORS.faint,
-                    }}
-                  >
+                  <td style={{ padding: "12px 14px", textAlign: "right", color: COLORS.faint }}>
                     <ChevronRight size={15} />
                   </td>
                 </tr>

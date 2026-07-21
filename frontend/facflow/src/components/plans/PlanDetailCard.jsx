@@ -56,21 +56,12 @@ function PlanDetailCard({
           }}
         >
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-                color: COLORS.faint,
-                marginBottom: 6,
-              }}
-            >
+            <div className="text-card-meta" style={{ marginBottom: 6 }}>
               계획 #{plan.planId} · {plan.productCode}
             </div>
             <div
+              className="text-card-title"
               style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontSize: 20,
-                fontWeight: 600,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -84,7 +75,7 @@ function PlanDetailCard({
             style={{
               background: "transparent",
               border: "none",
-              color: COLORS.muted,
+              color: "var(--color-muted)",
               cursor: "pointer",
               padding: 4,
               flexShrink: 0,
@@ -122,18 +113,17 @@ function PlanDetailCard({
           {canCancel ? (
             <button
               onClick={() => onCancel(plan.planId)}
+              className="text-btn-sm"
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
                 background: "transparent",
                 border: `1px solid ${COLORS.hairline}`,
-                color: COLORS.muted,
+                color: "var(--color-muted)",
                 borderRadius: 4,
                 padding: "8px 14px",
-                fontSize: 12,
                 cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
               }}
             >
               <Ban size={13} />
@@ -144,16 +134,15 @@ function PlanDetailCard({
           )}
           <button
             onClick={onClose}
+            className="text-btn"
             style={{
               marginLeft: "auto",
               background: "transparent",
               border: `1px solid ${COLORS.hairline}`,
-              color: COLORS.text,
+              color: "var(--color-text)",
               borderRadius: 4,
               padding: "8px 16px",
-              fontSize: 12.5,
               cursor: "pointer",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             닫기

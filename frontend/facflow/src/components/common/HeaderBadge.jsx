@@ -3,12 +3,11 @@ import React from "react";
 function HeaderBadge({ label, color }) {
   return (
     <div
+      className="text-header-badge"
       style={{
         display: "flex",
         alignItems: "center",
         gap: 8,
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: 11,
         color,
         border: `1px solid ${color}`,
         borderRadius: 4,

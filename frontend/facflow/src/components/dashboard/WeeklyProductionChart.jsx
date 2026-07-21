@@ -14,13 +14,7 @@ import {
 } from "recharts";
 import WeeklyTooltip from "./WeeklyTooltip";
 import { weekdayLabel } from "../../utils/format";
-
-const COLORS = {
-  panel: "#1B1F26",
-  hairline: "#2B313B",
-  amber: "#F5A623",
-  muted: "#8A93A3",
-};
+import { COLORS } from "../../constants/colors";
 
 function WeeklyProductionChart({ weeklyChart }) {
   const weekly = weeklyChart.map((d) => ({
@@ -46,24 +40,8 @@ function WeeklyProductionChart({ weeklyChart }) {
           marginBottom: 12,
         }}
       >
-        <div
-          style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: 15,
-            fontWeight: 600,
-          }}
-        >
-          주간 생산 추이
-        </div>
-        <div
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 11,
-            color: COLORS.muted,
-          }}
-        >
-          7일 · 단위 EA
-        </div>
+        <div className="text-section-title">주간 생산 추이</div>
+        <div className="text-chart-label">7일 · 단위 EA</div>
       </div>
       <div style={{ width: "100%", height: 240 }}>
         <ResponsiveContainer>
@@ -75,15 +53,19 @@ function WeeklyProductionChart({ weeklyChart }) {
             />
             <XAxis
               dataKey="label"
-              tick={{ fill: COLORS.muted, fontSize: 11, fontFamily: "Inter" }}
+              tick={{
+                fill: "var(--color-muted)",
+                fontSize: "var(--font-size-small)",
+                fontFamily: "var(--font-family-sans)",
+              }}
               axisLine={{ stroke: COLORS.hairline }}
               tickLine={false}
             />
             <YAxis
               tick={{
-                fill: COLORS.muted,
-                fontSize: 10,
-                fontFamily: "JetBrains Mono",
+                fill: "var(--color-muted)",
+                fontSize: "var(--font-size-caption)",
+                fontFamily: "var(--font-family-mono)",
               }}
               axisLine={false}
               tickLine={false}

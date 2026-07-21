@@ -83,23 +83,14 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
           }}
         >
           <div>
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-                color: COLORS.faint,
-                marginBottom: 6,
-              }}
-            >
+            <div className="text-card-meta" style={{ marginBottom: 6 }}>
               EQ-{String(eq.equipmentId).padStart(3, "0")}
             </div>
-            <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: 21, fontWeight: 600 }}>
-              {eq.equipmentName}
-            </div>
+            <div className="text-card-title-lg">{eq.equipmentName}</div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: "transparent", border: "none", color: COLORS.muted, cursor: "pointer", padding: 4 }}
+            style={{ background: "transparent", border: "none", color: "var(--color-muted)", cursor: "pointer", padding: 4 }}
           >
             <X size={20} />
           </button>
@@ -115,51 +106,20 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
           }}
         >
           <StatusBadge status={eq.status} meta={EQUIP_META} fallback="IDLE" />
-          <span
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11.5,
-              color: COLORS.faint,
-            }}
-          >
-            {kstDateLabel(eq.createdAt)} 등록
-          </span>
+          <span className="text-table-date">{kstDateLabel(eq.createdAt)} 등록</span>
         </div>
 
         <div style={{ padding: "18px 22px", borderBottom: `1px solid ${COLORS.hairline}` }}>
-          <div
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: 14,
-              fontWeight: 600,
-              marginBottom: 12,
-            }}
-          >
+          <div className="text-section-title-sm" style={{ marginBottom: 12 }}>
             최근 30일 생산 실적
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             {detailLoading ? (
-              <div
-                style={{
-                  gridColumn: "1 / -1",
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 11.5,
-                  color: COLORS.faint,
-                  padding: "8px 0",
-                }}
-              >
+              <div className="text-table-caption" style={{ gridColumn: "1 / -1", padding: "8px 0" }}>
                 생산 실적 불러오는 중...
               </div>
             ) : detailError ? (
-              <div
-                style={{
-                  gridColumn: "1 / -1",
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 11.5,
-                  color: COLORS.red,
-                  padding: "8px 0",
-                }}
-              >
+              <div className="text-error" style={{ gridColumn: "1 / -1", padding: "8px 0" }}>
                 생산 실적을 불러오지 못했습니다.
               </div>
             ) : (
@@ -185,19 +145,12 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
                 >
                   <s.Icon size={13} color={s.color} style={{ marginBottom: 6 }} />
                   <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-                    <span style={{ fontFamily: "'Oswald', sans-serif", fontSize: 17, fontWeight: 600, color: s.color }}>
+                    <span className="text-stat-value" style={{ color: s.color }}>
                       {s.value}
                     </span>
-                    <span style={{ fontSize: 11, color: COLORS.faint }}>{s.unit}</span>
+                    <span className="text-stat-unit">{s.unit}</span>
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 11,
-                      color: COLORS.faint,
-                      marginTop: 3,
-                    }}
-                  >
+                  <div className="text-stat-label" style={{ marginTop: 3 }}>
                     {s.label}
                   </div>
                 </div>
@@ -207,51 +160,21 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
         </div>
 
         <div style={{ padding: "18px 22px", borderBottom: `1px solid ${COLORS.hairline}` }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              marginBottom: 12,
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 12 }}>
             <Package size={14} color={COLORS.blue} />
-            <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: 14, fontWeight: 600 }}>
-              생산 가능 제품
-            </div>
+            <div className="text-section-title-sm">생산 가능 제품</div>
           </div>
 
           {detailLoading ? (
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11.5,
-                color: COLORS.faint,
-                padding: "4px 0",
-              }}
-            >
+            <div className="text-table-caption" style={{ padding: "4px 0" }}>
               제품 목록 불러오는 중...
             </div>
           ) : detailError ? (
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11.5,
-                color: COLORS.red,
-                padding: "4px 0",
-              }}
-            >
+            <div className="text-error" style={{ padding: "4px 0" }}>
               제품 목록을 불러오지 못했습니다.
             </div>
           ) : detail.products.length === 0 ? (
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11.5,
-                color: COLORS.faint,
-                padding: "4px 0",
-              }}
-            >
+            <div className="text-table-caption" style={{ padding: "4px 0" }}>
               등록된 생산 가능 제품이 없습니다.
             </div>
           ) : (
@@ -270,23 +193,11 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
                     padding: "10px 12px",
                   }}
                 >
-                  <div style={{ minWidth: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                  }}>
-                    <div style={{ fontSize: 11, color: COLORS.muted }}>{product.productCode}</div>
-                    <div style={{ fontSize: 14, color: COLORS.text }}>{product.productName}</div>
+                  <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                    <div className="text-equip-code">{product.productCode}</div>
+                    <div className="text-section-title-sm">{product.productName}</div>
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 11,
-                      color: COLORS.muted,
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
-                    }}
-                  >
+                  <div className="text-label" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
                     {fmt(product.hourlyCapacity)} EA/h
                   </div>
                 </div>
@@ -297,15 +208,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
 
         <div style={{ padding: "18px 22px" }}>
           {eq.status === "STOP" ? (
-            <div
-              style={{
-                fontSize: 12.5,
-                color: COLORS.faint,
-                background: COLORS.panelAlt,
-                borderRadius: 4,
-                padding: "12px 14px",
-              }}
-            >
+            <div className="text-notice-faint" style={{ background: COLORS.panelAlt, borderRadius: 4, padding: "12px 14px" }}>
               현재 점검중인 설비입니다.
             </div>
           ) : confirming ? (
@@ -319,8 +222,8 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
             >
               <div style={{ display: "flex", gap: 9, marginBottom: 12 }}>
                 <AlertTriangle size={16} color={COLORS.red} style={{ flexShrink: 0, marginTop: 1 }} />
-                <div style={{ fontSize: 12.5, color: COLORS.text, lineHeight: 1.5 }}>
-                  <strong style={{ color: COLORS.red }}>가동중인 설비입니다.</strong>
+                <div className="text-notice">
+                  <strong style={{ color: "var(--color-red)" }}>가동중인 설비입니다.</strong>
                   <br />
                   점검 처리하면 진행 중인 생산에 영향을 줄 수 있어요. 계속할까요?
                 </div>
@@ -328,22 +231,21 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
               <div style={{ display: "flex", gap: 8 }}>
                 <button
                   onClick={() => setConfirming(false)}
+                  className="text-btn-muted"
                   style={{
                     flex: 1,
                     background: "transparent",
                     border: `1px solid ${COLORS.hairline}`,
-                    color: COLORS.muted,
                     borderRadius: 4,
                     padding: "9px 0",
-                    fontSize: 12.5,
                     cursor: "pointer",
-                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   취소
                 </button>
                 <button
                   onClick={() => onSetStop(eq.equipmentId)}
+                  className="text-btn-action"
                   style={{
                     flex: 1,
                     display: "flex",
@@ -355,10 +257,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
                     color: "#210404",
                     borderRadius: 4,
                     padding: "9px 0",
-                    fontSize: 12.5,
-                    fontWeight: 600,
                     cursor: "pointer",
-                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   <ShieldAlert size={13} />
@@ -369,6 +268,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
           ) : (
             <button
               onClick={handleStopClick}
+              className="text-btn-action"
               style={{
                 width: "100%",
                 display: "flex",
@@ -380,10 +280,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
                 color: COLORS.red,
                 borderRadius: 4,
                 padding: "11px 0",
-                fontSize: 13.5,
-                fontWeight: 600,
                 cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
               }}
             >
               <ShieldAlert size={15} />

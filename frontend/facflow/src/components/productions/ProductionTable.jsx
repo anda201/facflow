@@ -51,27 +51,14 @@ function ProductionTable({
             borderBottom: `1px solid ${COLORS.hairline}`,
           }}
         >
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11.5,
-              color: COLORS.muted,
-            }}
-          >
+          <div className="text-table-caption">
             {countLabel ?? `${productions.length}건의 실적${runningCount > 0 ? " · 생산중 행을 클릭하면 완료 처리할 수 있어요" : ""}`}
           </div>
         </div>
       )}
 
       {productions.length === 0 ? (
-        <div
-          style={{
-            padding: "48px 20px",
-            textAlign: "center",
-            color: COLORS.faint,
-            fontSize: 13,
-          }}
-        >
+        <div className="text-table-empty" style={{ padding: "48px 20px", textAlign: "center" }}>
           {emptyMessage ?? "선택한 날짜에 생산 실적이 없습니다."}
         </div>
       ) : (
@@ -81,6 +68,7 @@ function ProductionTable({
               {headers.map((h, i) => (
                 <th
                   key={h || "act"}
+                  className="text-table-header"
                   style={{
                     textAlign:
                       i >= numericStartIndex && i <= numericStartIndex + 2
@@ -88,11 +76,6 @@ function ProductionTable({
                         : i === headers.length - 2
                         ? "center"
                         : "left",
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10.5,
-                    color: COLORS.faint,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
                     padding: "10px 16px",
                     borderBottom: `1px solid ${COLORS.hairline}`,
                     whiteSpace: "nowrap",
@@ -124,26 +107,11 @@ function ProductionTable({
                     animation: flashId === p.productionId ? "flashRow 2.2s ease-out" : "none",
                   }}
                 >
-                  <td
-                    style={{
-                      padding: "12px 16px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12,
-                      color: COLORS.faint,
-                    }}
-                  >
+                  <td className="text-table-id" style={{ padding: "12px 16px" }}>
                     #{p.productionId}
                   </td>
                   {showPlanDate && (
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11.5,
-                        color: COLORS.muted,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <td className="text-table-meta" style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
                       {displayDate(toKstDateInputValue(p.planDate))}
                       {!isCritical && startDelayDays > 0 && (
                         <DelayBadge
@@ -154,15 +122,7 @@ function ProductionTable({
                     </td>
                   )}
                   {showDueDate && (
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 11.5,
-                        color: COLORS.muted,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <td className="text-table-meta" style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
                       {displayDate(toKstDateInputValue(p.dueDate))}
                       {dueDelayDays > 0 && (
                         <DelayBadge
@@ -172,58 +132,24 @@ function ProductionTable({
                       )}
                     </td>
                   )}
-                  <td style={{ padding: "12px 16px", fontSize: 13 }}>{p.productName}</td>
-                  <td
-                    style={{
-                      padding: "12px 16px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12,
-                      color: COLORS.muted,
-                    }}
-                  >
+                  <td className="text-table-body" style={{ padding: "12px 16px" }}>
+                    {p.productName}
+                  </td>
+                  <td className="text-table-meta" style={{ padding: "12px 16px" }}>
                     {p.equipmentName}
                   </td>
-                  <td
-                    style={{
-                      padding: "12px 16px",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 11.5,
-                      color: COLORS.muted,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <td className="text-table-meta" style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
                     {timeLabel(p.startTime)} – {p.endTime ? timeLabel(p.endTime) : "진행중"}
                   </td>
-                  <td
-                    style={{
-                      padding: "12px 16px",
-                      textAlign: "right",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12.5,
-                      color: COLORS.green,
-                    }}
-                  >
+                  <td className="text-table-qty-good" style={{ padding: "12px 16px", textAlign: "right" }}>
                     {fmt(p.goodQty)}
                   </td>
-                  <td
-                    style={{
-                      padding: "12px 16px",
-                      textAlign: "right",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12.5,
-                      color: COLORS.red,
-                    }}
-                  >
+                  <td className="text-table-qty-bad" style={{ padding: "12px 16px", textAlign: "right" }}>
                     {fmt(p.defectQty)}
                   </td>
                   <td
-                    style={{
-                      padding: "12px 16px",
-                      textAlign: "right",
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: 12,
-                      color: rate > 5 ? COLORS.red : COLORS.muted,
-                    }}
+                    className={`text-table-rate${rate > 5 ? " is-high" : ""}`}
+                    style={{ padding: "12px 16px", textAlign: "right" }}
                   >
                     {rate.toFixed(2)}%
                   </td>
@@ -234,14 +160,7 @@ function ProductionTable({
                       fallback="DONE"
                     />
                     {p.status === "HALT" && p.remainingQty != null && (
-                      <div
-                        style={{
-                          marginTop: 4,
-                          fontFamily: "'JetBrains Mono', monospace",
-                          fontSize: 10,
-                          color: COLORS.red,
-                        }}
-                      >
+                      <div className="text-table-remaining-sub" style={{ marginTop: 4 }}>
                         잔량 {fmt(p.remainingQty)} EA
                       </div>
                     )}

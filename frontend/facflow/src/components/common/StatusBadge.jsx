@@ -8,12 +8,11 @@ function StatusBadge({ status, meta, fallback }) {
 
   return (
     <span
+      className="text-badge"
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: 5,
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: 11,
         color: resolved.color,
         border: `1px solid ${resolved.color}55`,
         background: `${resolved.color}14`,

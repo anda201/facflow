@@ -4,13 +4,11 @@ import { COLORS } from "../../constants/colors";
 function PageHeader({ title, subtitle, icon: Icon, children }) {
   return (
     <div
+      className="page-header-sticky"
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        borderBottom: `1px solid ${COLORS.hairline}`,
-        paddingBottom: 18,
-        marginBottom: 20,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -29,24 +27,10 @@ function PageHeader({ title, subtitle, icon: Icon, children }) {
           <Icon size={20} color={COLORS.amber} />
         </div>
         <div>
-          <div
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontSize: 22,
-              fontWeight: 600,
-              letterSpacing: "0.02em",
-            }}
-          >
+          <div className="text-page-title" style={{ letterSpacing: "0.02em" }}>
             {title}
           </div>
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11,
-              color: COLORS.muted,
-              marginTop: 2,
-            }}
-          >
+          <div className="text-page-subtitle" style={{ marginTop: 2 }}>
             {subtitle}
           </div>
         </div>

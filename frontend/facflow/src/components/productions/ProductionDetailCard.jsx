@@ -45,32 +45,17 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
           }}
         >
           <div>
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-                color: COLORS.faint,
-                marginBottom: 6,
-              }}
-            >
+            <div className="text-card-meta" style={{ marginBottom: 6 }}>
               실적 #{production.productionId} · {production.equipmentName}
             </div>
-            <div
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontSize: 20,
-                fontWeight: 600,
-              }}
-            >
-              {production.productName}
-            </div>
+            <div className="text-card-title">{production.productName}</div>
           </div>
           <button
             onClick={onClose}
             style={{
               background: "transparent",
               border: "none",
-              color: COLORS.muted,
+              color: "var(--color-muted)",
               cursor: "pointer",
               padding: 4,
             }}
@@ -97,19 +82,10 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
             ["종료 시각", production.endTime ? timeLabel(production.endTime) : "진행중"],
           ].map(([label, value]) => (
             <div key={label}>
-              <div
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 10.5,
-                  color: COLORS.faint,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  marginBottom: 5,
-                }}
-              >
+              <div className="text-info-label" style={{ marginBottom: 5 }}>
                 {label}
               </div>
-              <div style={{ fontSize: 13.5 }}>{value}</div>
+              <div className="text-info-value">{value}</div>
             </div>
           ))}
         </div>
@@ -128,10 +104,10 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
           >
             <PlayCircle size={18} color={COLORS.amber} style={{ flexShrink: 0, marginTop: 1 }} />
             <div>
-              <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 4 }}>
+              <div className="text-body-semibold" style={{ marginBottom: 4 }}>
                 생산 중인 실적입니다
               </div>
-              <div style={{ fontSize: 12.5, color: COLORS.muted, lineHeight: 1.5 }}>
+              <div className="text-body-muted" style={{ lineHeight: 1.5 }}>
                 생산 완료 처리 시 해당 설비가 대기 상태로 전환되고, 실적이 완료 상태로 집계됩니다.
                 현장 작업이 모두 끝났는지 확인한 뒤 완료해 주세요.
               </div>
@@ -150,11 +126,10 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
         >
           {confirmingComplete ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 12, color: COLORS.green }}>
-                이 생산을 완료 처리할까요?
-              </span>
+              <span className="text-success">이 생산을 완료 처리할까요?</span>
               <button
                 onClick={() => onComplete(production.productionId)}
+                className="text-btn-sm"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -164,9 +139,7 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
                   color: COLORS.green,
                   borderRadius: 4,
                   padding: "6px 12px",
-                  fontSize: 11.5,
                   cursor: "pointer",
-                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 <Check size={12} />
@@ -174,15 +147,13 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
               </button>
               <button
                 onClick={() => setConfirmingComplete(false)}
+                className="text-btn-muted"
                 style={{
                   background: "transparent",
                   border: `1px solid ${COLORS.hairline}`,
-                  color: COLORS.muted,
                   borderRadius: 4,
                   padding: "6px 12px",
-                  fontSize: 11.5,
                   cursor: "pointer",
-                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 취소
@@ -191,6 +162,7 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
           ) : (
             <button
               onClick={() => setConfirmingComplete(true)}
+              className="text-btn-sm"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -200,10 +172,8 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
                 color: COLORS.green,
                 borderRadius: 4,
                 padding: "8px 14px",
-                fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
               }}
             >
               <CheckCircle2 size={13} />
@@ -212,16 +182,15 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
           )}
           <button
             onClick={onClose}
+            className="text-btn"
             style={{
               marginLeft: "auto",
               background: "transparent",
               border: `1px solid ${COLORS.hairline}`,
-              color: COLORS.text,
+              color: "var(--color-text)",
               borderRadius: 4,
               padding: "8px 16px",
-              fontSize: 12.5,
               cursor: "pointer",
-              fontFamily: "'Inter', sans-serif",
             }}
           >
             닫기

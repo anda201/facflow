@@ -12,7 +12,7 @@ const Navbar = () => {
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark layout-navbar">
             <div className="container">
                 <Link className="navbar-brand" to="/dashboard">
                     <img src="/facflow_icon.png" alt="FacFlow" height="30" className="me-2" />

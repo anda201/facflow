@@ -53,23 +53,13 @@ export default function PlanEquipmentSection({
               <Sparkles size={15} color={COLORS.amber} />
             </div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 9.5,
-                  color: COLORS.amber,
-                  letterSpacing: "0.08em",
-                  marginBottom: 2,
-                }}
-              >
+              <div className="text-accent-label" style={{ marginBottom: 2 }}>
                 추천 설비
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
                 <span
+                  className="text-section-title"
                   style={{
-                    fontFamily: "'Oswald', sans-serif",
-                    fontSize: 15,
-                    fontWeight: 600,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -78,13 +68,11 @@ export default function PlanEquipmentSection({
                   {recommendedEquip.equipmentName}
                 </span>
                 <span
+                  className="text-equip-hours"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 4,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 11,
-                    color: COLORS.muted,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -97,17 +85,16 @@ export default function PlanEquipmentSection({
           <button
             disabled={!recommendedAvailable}
             onClick={() => onSelectEquip(recommendedEquip.equipmentId)}
+            className="text-filter"
             style={{
               flexShrink: 0,
               background: recommendedAvailable ? COLORS.amber : COLORS.panelAlt,
               border: `1px solid ${recommendedAvailable ? COLORS.amber : COLORS.hairline}`,
-              color: recommendedAvailable ? "#1A1300" : COLORS.faint,
+              color: recommendedAvailable ? "#1A1300" : "var(--color-faint)",
               borderRadius: 4,
               padding: "7px 12px",
-              fontSize: 11.5,
               fontWeight: 600,
               cursor: recommendedAvailable ? "pointer" : "not-allowed",
-              fontFamily: "'Inter', sans-serif",
               whiteSpace: "nowrap",
             }}
           >
@@ -118,20 +105,8 @@ export default function PlanEquipmentSection({
 
       <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 12 }}>
         <Wrench size={14} color={COLORS.amber} />
-        <div style={{ fontFamily: "'Oswald', sans-serif", fontSize: 14, fontWeight: 600 }}>
-          {title}
-        </div>
-        {subtitle && (
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10.5,
-              color: COLORS.faint,
-            }}
-          >
-            {subtitle}
-          </div>
-        )}
+        <div className="text-section-title-sm">{title}</div>
+        {subtitle && <div className="text-label-faint">{subtitle}</div>}
       </div>
 
       <div
@@ -176,13 +151,12 @@ export default function PlanEquipmentSection({
             >
               <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
                 <span
+                  className="text-equip-pick-name"
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: 5,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 13,
-                    color: selected ? COLORS.amber : COLORS.text,
+                    color: selected ? COLORS.amber : undefined,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -196,14 +170,12 @@ export default function PlanEquipmentSection({
                   </span>
                 </span>
                 <span
+                  className="text-equip-hours"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 4,
                     marginTop: 4,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 11,
-                    color: COLORS.muted,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -212,13 +184,12 @@ export default function PlanEquipmentSection({
                 </span>
               </div>
               <span
+                className="text-equip-status"
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 4,
-                  fontSize: 10,
                   color: em.color,
-                  fontFamily: "'JetBrains Mono', monospace",
                   flexShrink: 0,
                   paddingTop: 2,
                 }}

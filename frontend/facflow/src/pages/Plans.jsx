@@ -305,6 +305,7 @@ export default function ProductionPlanDashboard() {
             setShowForm((v) => !v);
             setCreateError(null);
           }}
+          className="text-btn-action"
           style={{
             display: "flex",
             alignItems: "center",
@@ -314,10 +315,7 @@ export default function ProductionPlanDashboard() {
             color: showForm ? COLORS.amber : "#1A1300",
             borderRadius: 4,
             padding: "9px 16px",
-            fontSize: 13,
-            fontWeight: 600,
             cursor: "pointer",
-            fontFamily: "'Inter', sans-serif",
           }}
         >
           {showForm ? <X size={15} /> : <Plus size={15} />}

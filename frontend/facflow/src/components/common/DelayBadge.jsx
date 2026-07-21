@@ -4,9 +4,9 @@ export default function DelayBadge({ label, color }) {
   if (!label) return null;
   return (
     <span
+      className="text-delay-badge"
       style={{
         marginLeft: 8,
-        fontSize: 10.5,
         fontWeight: 700,
         color,
         background: `${color}22`,

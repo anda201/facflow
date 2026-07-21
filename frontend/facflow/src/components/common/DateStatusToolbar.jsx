@@ -31,33 +31,30 @@ function DateStatusToolbar({
           type="date"
           value={selectedDate}
           onChange={(e) => onDateChange(e.target.value)}
+          className="text-input"
           style={{
             background: COLORS.panelAlt,
             border: `1px solid ${COLORS.hairline}`,
             borderRadius: 4,
-            color: COLORS.text,
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 12.5,
             padding: "7px 10px",
             colorScheme: "dark",
           }}
         />
         <button
           onClick={onTodayClick}
+          className="text-btn-sm"
           style={{
             background: "transparent",
             border: `1px solid ${COLORS.hairline}`,
-            color: COLORS.muted,
+            color: "var(--color-muted)",
             borderRadius: 4,
             padding: "7px 12px",
-            fontSize: 12,
             cursor: "pointer",
-            fontFamily: "'Inter', sans-serif",
           }}
         >
           오늘
         </button>
-        <div style={{ fontSize: 12.5, color: COLORS.muted, marginLeft: 4 }}>
+        <div className="text-toolbar-date" style={{ marginLeft: 4 }}>
           {displayDate(selectedDate)}
         </div>
       </div>
@@ -67,14 +64,13 @@ function DateStatusToolbar({
           <button
             key={c.key}
             onClick={() => onStatusFilterChange(c.key)}
+            className="text-filter"
             style={{
               background: statusFilter === c.key ? `${c.color}20` : "transparent",
               border: `1px solid ${statusFilter === c.key ? c.color : COLORS.hairline}`,
-              color: statusFilter === c.key ? c.color : COLORS.muted,
+              color: statusFilter === c.key ? c.color : "var(--color-muted)",
               borderRadius: 3,
               padding: "6px 12px",
-              fontSize: 11.5,
-              fontFamily: "'JetBrains Mono', monospace",
               cursor: "pointer",
             }}
           >

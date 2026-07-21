@@ -17,13 +17,11 @@ export default function DelayAlertSection({ severity, count, title, children, Ic
       }}
     >
       <div
+        className="text-alert-title"
         style={{
           display: "flex",
           alignItems: "center",
           gap: 7,
-          fontFamily: "'Oswald', sans-serif",
-          fontSize: 14,
-          fontWeight: 600,
           marginBottom: 10,
           color,
           paddingLeft: 4,

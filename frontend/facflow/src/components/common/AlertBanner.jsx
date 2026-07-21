@@ -4,11 +4,6 @@
 import React from "react";
 import { TriangleAlert } from "lucide-react";
 
-const COLORS = {
-  red: "#E5484D",
-  muted: "#8A93A3",
-};
-
 function AlertBanner({ show, title, description }) {
   if (!show) return null;
 
@@ -19,7 +14,7 @@ function AlertBanner({ show, title, description }) {
         alignItems: "flex-start",
         gap: 12,
         background: "rgba(229,72,77,0.08)",
-        border: `1px solid ${COLORS.red}`,
+        border: "1px solid var(--color-red)",
         borderRadius: 4,
         padding: "12px 16px",
         marginBottom: 20,
@@ -27,15 +22,15 @@ function AlertBanner({ show, title, description }) {
     >
       <TriangleAlert
         size={18}
-        color={COLORS.red}
+        color="var(--color-red)"
         style={{ marginTop: 2, flexShrink: 0 }}
       />
       <div>
-        <div style={{ fontWeight: 600, fontSize: 13, color: COLORS.red }}>
+        <div className="text-error" style={{ fontWeight: 600 }}>
           {title}
         </div>
         {description && (
-          <div style={{ fontSize: 12, color: COLORS.muted, marginTop: 2 }}>
+          <div className="text-body-muted" style={{ marginTop: 2 }}>
             {description}
           </div>
         )}

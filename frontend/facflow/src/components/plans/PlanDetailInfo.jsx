@@ -29,19 +29,10 @@ export default function PlanDetailInfo({ plan, producedQty, remainingQty }) {
     >
       {rows.map(([label, value]) => (
         <div key={label}>
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10.5,
-              color: COLORS.faint,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              marginBottom: 5,
-            }}
-          >
+          <div className="text-info-label" style={{ marginBottom: 5 }}>
             {label}
           </div>
-          <div style={{ fontSize: 13.5 }}>{value}</div>
+          <div className="text-info-value">{value}</div>
         </div>
       ))}
     </div>

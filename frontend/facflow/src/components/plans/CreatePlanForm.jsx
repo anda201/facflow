@@ -21,23 +21,10 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
     background: COLORS.panelAlt,
     border: `1px solid ${COLORS.hairline}`,
     borderRadius: 4,
-    color: COLORS.text,
-    fontFamily: "'Inter', sans-serif",
-    fontSize: 13,
     padding: "9px 10px",
     width: "100%",
     boxSizing: "border-box",
     colorScheme: "dark",
-  };
-
-  const labelStyle = {
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 10.5,
-    color: COLORS.muted,
-    letterSpacing: "0.05em",
-    marginBottom: 6,
-    display: "block",
-    textTransform: "uppercase",
   };
 
   function submit() {
@@ -97,21 +84,13 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
           marginBottom: 16,
         }}
       >
-        <div
-          style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontSize: 15,
-            fontWeight: 600,
-          }}
-        >
-          새 생산 계획 등록
-        </div>
+        <div className="text-section-title">새 생산 계획 등록</div>
         <button
           onClick={onCancel}
           style={{
             background: "transparent",
             border: "none",
-            color: COLORS.muted,
+            color: "var(--color-muted)",
             cursor: "pointer",
             display: "flex",
           }}
@@ -129,10 +108,13 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
         }}
       >
         <div>
-          <label style={labelStyle}>제품</label>
+          <label className="text-label-uppercase" style={{ marginBottom: 6, display: "block" }}>
+            제품
+          </label>
           <select
             value={productId}
             onChange={(e) => setProductId(e.target.value)}
+            className="text-form-input"
             style={inputStyle}
           >
             {products.map((p) => (
@@ -143,40 +125,49 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
           </select>
         </div>
         <div>
-          <label style={labelStyle}>생산 예정일</label>
+          <label className="text-label-uppercase" style={{ marginBottom: 6, display: "block" }}>
+            생산 예정일
+          </label>
           <input
             type="date"
             value={planDate}
             min={today}
             onChange={(e) => setPlanDate(e.target.value)}
+            className="text-form-input"
             style={inputStyle}
           />
         </div>
         <div>
-          <label style={labelStyle}>생산 완료일</label>
+          <label className="text-label-uppercase" style={{ marginBottom: 6, display: "block" }}>
+            생산 완료일
+          </label>
           <input
             type="date"
             value={dueDate}
             min={dueDateMin}
             onChange={(e) => setDueDate(e.target.value)}
+            className="text-form-input"
             style={inputStyle}
           />
         </div>
         <div>
-          <label style={labelStyle}>목표 수량 (EA)</label>
+          <label className="text-label-uppercase" style={{ marginBottom: 6, display: "block" }}>
+            목표 수량 (EA)
+          </label>
           <input
             type="number"
             min="1"
             placeholder="예: 500"
             value={targetQty}
             onChange={(e) => setTargetQty(e.target.value)}
+            className="text-form-input"
             style={inputStyle}
           />
         </div>
       </div>
 
       {(error || serverError) && (
-        <div style={{ color: COLORS.red, fontSize: 12, marginBottom: 12 }}>
+        <div className="text-error" style={{ marginBottom: 12 }}>
           {error || serverError}
         </div>
       )}
@@ -184,31 +175,27 @@ function CreatePlanForm({ products, defaultDate, serverError, onCancel, onCreate
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
         <button
           onClick={onCancel}
+          className="text-btn-muted"
           style={{
             background: "transparent",
             border: `1px solid ${COLORS.hairline}`,
-            color: COLORS.muted,
             borderRadius: 4,
             padding: "8px 16px",
-            fontSize: 12.5,
             cursor: "pointer",
-            fontFamily: "'Inter', sans-serif",
           }}
         >
           취소
         </button>
         <button
           onClick={submit}
+          className="text-btn-action"
           style={{
             background: COLORS.amber,
             border: `1px solid ${COLORS.amber}`,
             color: "#1A1300",
             borderRadius: 4,
             padding: "8px 18px",
-            fontSize: 12.5,
-            fontWeight: 600,
             cursor: "pointer",
-            fontFamily: "'Inter', sans-serif",
           }}
         >
           계획 등록
