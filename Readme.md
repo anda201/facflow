@@ -1,4 +1,5 @@
 # 🏭 FacFlow
+![FacFlow 메인 화면](./docs/assets/readme/facflow_main_img.png)
 
 > 생산 계획부터 생산 실적, 설비, 품질 데이터까지 통합 관리할 수 있는 웹 기반 MES(Manufacturing Execution System)
 
@@ -16,7 +17,9 @@
 
 ## 📌 프로젝트 소개
 
+
 FacFlow는 제조업의 생산 과정을 관리하는 웹 기반 MES 시스템입니다.
+
 
 생산 계획을 등록하고 설비를 배정해 생산을 시작·종료할 수 있으며, 생산 가능 설비와 시간당 생산량을 기준으로 **예상 소요 시간이 가장 짧은 설비**를 추천합니다.
 
@@ -141,13 +144,7 @@ facflow/
 ├── Readme.md
 ├── docs/
 │   └── assets/
-│       └── readme/                  # README용 ERD·화면 GIF (원본 mp4는 videos/)
-│           ├── erd.png
-│           ├── dashboard.gif
-│           ├── plans-1.gif
-│           ├── plans-2.gif
-│           ├── productions.gif
-│           └── equipments.gif
+│       └── readme/                  # README용 ERD·화면 GIF
 ├── database/
 │   ├── facflowSql.sql
 │   └── mes_dummy_data.sql
