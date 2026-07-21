@@ -17,6 +17,7 @@ function PlanTable({
   onRowClick,
   showPlanDate = false,
   showDueDate = false,
+  showRemainingQty = false,
   countLabel,
   emptyMessage,
   borderRadius = "0 0 4px 4px",
@@ -31,9 +32,13 @@ function PlanTable({
   headers.push("계획 ID");
   if (showPlanDate) headers.push("생산 예정일");
   if (showDueDate) headers.push("마감일");
-  headers.push("제품코드", "제품명", "목표 수량", "상태", "등록일", "");
+  headers.push("제품코드", "제품명", "목표 수량");
+  if (showRemainingQty) headers.push("잔량");
+  headers.push("상태", "등록일", "");
 
   const qtyColIndex = headers.indexOf("목표 수량");
+  const remainingColIndex = headers.indexOf("잔량");
+  const rightAlignCols = new Set([qtyColIndex, remainingColIndex].filter((i) => i >= 0));
 
   return (
     <div
@@ -103,7 +108,7 @@ function PlanTable({
                 <th
                   key={h || "chev"}
                   style={{
-                    textAlign: i === qtyColIndex ? "right" : "left",
+                    textAlign: rightAlignCols.has(i) ? "right" : "left",
                     fontFamily: "'JetBrains Mono', monospace",
                     fontSize: 10.5,
                     color: COLORS.faint,
@@ -205,6 +210,19 @@ function PlanTable({
                   >
                     {fmt(p.targetQty)}
                   </td>
+                  {showRemainingQty && (
+                    <td
+                      style={{
+                        padding: "12px 18px",
+                        textAlign: "right",
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 12.5,
+                        color: p.status === "HALT" ? COLORS.red : COLORS.faint,
+                      }}
+                    >
+                      {p.remainingQty != null ? fmt(p.remainingQty) : "—"}
+                    </td>
+                  )}
                   <td style={{ padding: "12px 18px" }}>
                     <StatusBadge status={p.status} meta={PLAN_STATUS_META} fallback="WAIT" />
                   </td>

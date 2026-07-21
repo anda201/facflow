@@ -80,7 +80,7 @@ export default function EquipmentStatusDashboard() {
       );
 
       console.log(result);
-      setSummary((prev) => patchSummary(prev, result.status, "STOP"));
+      setSummary((prev) => patchSummary(prev, result.previousStatus, "STOP"));
       setActiveId(null);
 
     } catch (e) {

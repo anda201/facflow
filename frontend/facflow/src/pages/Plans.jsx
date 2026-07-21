@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getPlan, createPlan, startPlan, getProducts, getAvailableEquipment } from "../api";
+import { getPlan, createPlan, startPlan, getProducts, getAvailableEquipment, updatePlanStatus, resumeHaltedPlan } from "../api";
 import {
   toKstDateInputValue,
 } from "../utils/format";
@@ -20,6 +20,7 @@ import {
   ListTodo,
   Plus,
   AlertTriangle,
+  OctagonPause,
   X,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ const EMPTY_SUMMARY = {
   runningPlans: 0,
   completedPlans: 0,
   canceledPlans: 0,
+  haltedPlans: 0,
 };
 
 
@@ -44,6 +46,7 @@ export default function ProductionPlanDashboard() {
     const [equipment, setEquipment] = useState([]);
     const [plans, setPlans] = useState([]);
     const [overduePlans, setOverduePlans] = useState([]);
+    const [haltedPlans, setHaltedPlans] = useState([]);
     const [summary, setSummary] = useState(EMPTY_SUMMARY);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -71,6 +74,7 @@ export default function ProductionPlanDashboard() {
           const result = await getPlan({ planDate: selectedDate });
           setPlans(result.plans ?? []);
           setOverduePlans(result.overduePlans ?? []);
+          setHaltedPlans(result.haltedPlans ?? []);
           setSummary(result.summary ?? EMPTY_SUMMARY);
         } catch (e) {
           setError(e);
@@ -88,8 +92,8 @@ export default function ProductionPlanDashboard() {
         return;
       }
 
-      const plan = [...overduePlans, ...plans].find((p) => p.planId === activePlanId);
-      if (!plan || plan.status !== "WAIT") {
+      const plan = [...haltedPlans, ...overduePlans, ...plans].find((p) => p.planId === activePlanId);
+      if (!plan || (plan.status !== "WAIT" && plan.status !== "HALT")) {
         setRecommendation(null);
         setEquipment([]);
         return;
@@ -106,13 +110,20 @@ export default function ProductionPlanDashboard() {
         }
       };
       fetchPlanDetail();
-    }, [activePlanId, plans, overduePlans]);
+    }, [activePlanId, plans, overduePlans, haltedPlans]);
 
   const overduePlansForView = useMemo(() => {
     return overduePlans
       .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
       .sort((a, b) => a.planDate.localeCompare(b.planDate) || b.planId - a.planId);
   }, [overduePlans, statusFilter]);
+
+  const haltedPlansForView = useMemo(() => {
+    if (statusFilter !== "ALL" && statusFilter !== "HALT") return [];
+    return haltedPlans.sort(
+      (a, b) => a.planDate.localeCompare(b.planDate) || b.planId - a.planId
+    );
+  }, [haltedPlans, statusFilter]);
 
   const { startDelayed: startDelayedPlans, dueOverdue: dueOverduePlans } = useMemo(
     () => splitByDelaySeverity(overduePlansForView),
@@ -125,12 +136,15 @@ export default function ProductionPlanDashboard() {
   );
 
   const plansForDate = useMemo(() => {
-    const overdueIds = new Set(overduePlans.map((p) => p.planId));
+    const excludedIds = new Set([
+      ...overduePlans.map((p) => p.planId),
+      ...haltedPlans.map((p) => p.planId),
+    ]);
     return plans
-      .filter((p) => !overdueIds.has(p.planId))
+      .filter((p) => !excludedIds.has(p.planId))
       .filter((p) => statusFilter === "ALL" || p.status === statusFilter)
       .sort((a, b) => b.planId - a.planId);
-  }, [plans, overduePlans, statusFilter]);
+  }, [plans, overduePlans, haltedPlans, statusFilter]);
 
   if (loading) {
     return <div className="dashboard">로딩 중...</div>;
@@ -143,7 +157,8 @@ export default function ProductionPlanDashboard() {
   const dateTargetTotal = plansForDate.reduce((s, p) => s + p.targetQty, 0);
   const dueOverdueTargetTotal = dueOverduePlans.reduce((s, p) => s + p.targetQty, 0);
   const startDelayedTargetTotal = startDelayedPlans.reduce((s, p) => s + p.targetQty, 0);
-  const activePlan = [...overduePlans, ...plans].find((p) => p.planId === activePlanId) || null;
+  const haltedTargetTotal = haltedPlansForView.reduce((s, p) => s + p.targetQty, 0);
+  const activePlan = [...haltedPlans, ...overduePlans, ...plans].find((p) => p.planId === activePlanId) || null;
 
 
   async function handleCreate(form) {
@@ -167,6 +182,7 @@ export default function ProductionPlanDashboard() {
         const result = await getPlan({ planDate: form.planDate });
         setPlans(result.plans ?? []);
         setOverduePlans(result.overduePlans ?? []);
+        setHaltedPlans(result.haltedPlans ?? []);
         setSummary(result.summary ?? EMPTY_SUMMARY);
       }
 
@@ -185,7 +201,7 @@ export default function ProductionPlanDashboard() {
 
     try {
       const response = await startPlan(planId, requestBody);
-      const target = [...overduePlans, ...plans].find((p) => p.planId === planId);
+      const target = [...haltedPlans, ...overduePlans, ...plans].find((p) => p.planId === planId);
       setPlans((prev) =>
         prev.map((p) =>
           p.planId === planId ? { ...p, status: "RUN", equipmentId } : p
@@ -216,26 +232,60 @@ export default function ProductionPlanDashboard() {
     }
   }
 
-// 구현 예정
-  function handleDelete(planId) {
-    const target = [...overduePlans, ...plans].find((p) => p.planId === planId);
-    setPlans((prev) => prev.filter((p) => p.planId !== planId));
-    setOverduePlans((prev) => prev.filter((p) => p.planId !== planId));
-    if (target?.status === "WAIT" && target.planDate === selectedDate) {
-      setSummary((prev) => ({
-        ...prev,
-        totalPlans: prev.totalPlans - 1,
-        waitPlans: prev.waitPlans - 1,
-      }));
-    }
-    if (target && target.status === "RUN" && target.equipmentId) {
-      setEquipment((prev) =>
-        prev.map((e) =>
-          e.equipmentId === target.equipmentId ? { ...e, status: "IDLE" } : e
-        )
+  async function handleCancel(planId) {
+    try {
+      await updatePlanStatus(planId, { status: "CANCEL" });
+      const target = [...haltedPlans, ...overduePlans, ...plans].find((p) => p.planId === planId);
+      setPlans((prev) =>
+        prev.map((p) => (p.planId === planId ? { ...p, status: "CANCEL" } : p))
       );
+      setOverduePlans((prev) => prev.filter((p) => p.planId !== planId));
+      setHaltedPlans((prev) => prev.filter((p) => p.planId !== planId));
+      if (target?.planDate === selectedDate) {
+        setSummary((prev) => ({
+          ...prev,
+          ...(target.status === "HALT"
+            ? { haltedPlans: Math.max(0, prev.haltedPlans - 1) }
+            : target.status === "WAIT"
+            ? { waitPlans: Math.max(0, prev.waitPlans - 1) }
+            : {}),
+          canceledPlans: prev.canceledPlans + 1,
+        }));
+      }
+      setActivePlanId(null);
+    } catch (e) {
+      setError(e);
     }
-    setActivePlanId(null);
+  }
+
+  async function handleResume(planId, equipmentId) {
+    try {
+      const result = await resumeHaltedPlan(planId, { equipmentId });
+      const target = [...haltedPlans, ...overduePlans, ...plans].find((p) => p.planId === planId);
+
+      setPlans((prev) =>
+        prev
+          .map((p) => (p.planId === planId ? { ...p, status: "CANCEL" } : p))
+      );
+      setOverduePlans((prev) => prev.filter((p) => p.planId !== planId));
+      setHaltedPlans((prev) => prev.filter((p) => p.planId !== planId));
+
+      if (result.planDate === selectedDate) {
+        const refetch = await getPlan({ planDate: selectedDate });
+        setPlans(refetch.plans ?? []);
+        setOverduePlans(refetch.overduePlans ?? []);
+        setHaltedPlans(refetch.haltedPlans ?? []);
+        setSummary(refetch.summary ?? EMPTY_SUMMARY);
+      } else {
+        setSelectedDate(result.planDate);
+      }
+
+      setFlashId(result.newPlanId);
+      setTimeout(() => setFlashId(null), 2200);
+      setActivePlanId(null);
+    } catch (e) {
+      setError(e);
+    }
   }
 
   return (
@@ -277,10 +327,11 @@ export default function ProductionPlanDashboard() {
       {/* Summary strip */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
         <SummaryChip label="전체 계획" unit="건" value={summary.totalPlans} color={COLORS.blue} Icon={ListTodo} />
-        <SummaryChip label="대기" unit="건" unit="건" value={summary.waitPlans} color={COLORS.muted} Icon={Clock} />
+        <SummaryChip label="대기" unit="건" value={summary.waitPlans} color={COLORS.muted} Icon={Clock} />
         <SummaryChip label="진행중" unit="건" value={summary.runningPlans} color={COLORS.amber} Icon={PlayCircle} />
         <SummaryChip label="완료" unit="건" value={summary.completedPlans} color={COLORS.green} Icon={CheckCircle2} />
         <SummaryChip label="취소" unit="건" value={summary.canceledPlans} color={COLORS.red} Icon={Ban} />
+        <SummaryChip label="중단" unit="건" value={summary.haltedPlans ?? 0} color={COLORS.red} Icon={OctagonPause} />
         <SummaryChip label="착수 지연" unit="건" value={delaySummary.startDelayed.length} color={COLORS.amber} Icon={Clock} />
         <SummaryChip label="납기 지연" unit="건" value={delaySummary.dueOverdue.length} color={COLORS.red} Icon={AlertTriangle} />
       </div>
@@ -297,6 +348,26 @@ export default function ProductionPlanDashboard() {
           }}
           onCreate={handleCreate}
         />
+      )}
+
+      {haltedPlansForView.length > 0 && (
+        <DelayAlertSection
+          severity="critical"
+          count={haltedPlansForView.length}
+          title="중단된 계획"
+          Icon={OctagonPause}
+        >
+          <PlanTable
+            plans={haltedPlansForView}
+            dateTargetTotal={haltedTargetTotal}
+            flashId={flashId}
+            onRowClick={setActivePlanId}
+            showPlanDate
+            showRemainingQty
+            borderRadius="4px"
+            variant="delay-critical"
+          />
+        </DelayAlertSection>
       )}
 
       {dueOverduePlans.length > 0 && (
@@ -359,7 +430,8 @@ export default function ProductionPlanDashboard() {
           recommendation={recommendation}
           onClose={() => setActivePlanId(null)}
           onStart={handleStart}
-          onDelete={handleDelete}
+          onCancel={handleCancel}
+          onResume={handleResume}
         />
       )}
     </div>

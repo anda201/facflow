@@ -21,16 +21,18 @@ exports.getPlan = async function (planDate) {
   }
 
   try {
-    const [summary, plans, overduePlans] = await Promise.all([
+    const [summary, plans, overduePlans, haltedPlans] = await Promise.all([
       planDao.selectPlanSummary(connection, date),
       planDao.selectPlanList(connection, date),
       planDao.selectOverduePlanList(connection),
+      planDao.selectHaltedPlanList(connection),
     ]);
 
     return {
       summary: summary[0],
       plans,
       overduePlans,
+      haltedPlans,
     };
 
   } catch (err) {
@@ -129,6 +131,71 @@ exports.startPlan = async function (planId, equipmentId) {
     }
 };
 
+exports.resumeHaltedPlan = async function (planId, equipmentId) {
+    let connection;
+
+    try {
+        connection = await pool.getConnection(async (conn) => conn);
+    } catch (err) {
+        logger.error(`resumeHaltedPlan DB Connection error\n: ${JSON.stringify(err)}`);
+        throw err;
+    }
+
+    try {
+        await connection.beginTransaction();
+
+        const plan = await planDao.selectPlanById(connection, planId);
+        if (!plan) {
+            const err = new Error("PLAN_NOT_FOUND");
+            err.statusCode = 404;
+            throw err;
+        }
+        if (plan.status !== "HALT") {
+            const err = new Error("PLAN_NOT_HALT");
+            err.statusCode = 400;
+            throw err;
+        }
+        if (!plan.remainingQty || plan.remainingQty <= 0) {
+            const err = new Error("NO_REMAINING_QTY");
+            err.statusCode = 400;
+            throw err;
+        }
+
+        const resumePlanDate = today();
+        const resumeDueDate =
+            plan.dueDate >= resumePlanDate ? plan.dueDate : resumePlanDate;
+
+        const insertResult = await planDao.insertPlan(
+            connection,
+            plan.productId,
+            resumePlanDate,
+            resumeDueDate,
+            plan.remainingQty
+        );
+        const newPlanId = insertResult.insertId;
+
+        await planDao.updatePlanStatus(connection, planId, "CANCEL");
+        await planDao.updatePlanStatus(connection, newPlanId, "RUN");
+        await equipmentDao.updateEquipmentStatus(connection, equipmentId, "RUN");
+        await productionDao.insertProduction(connection, newPlanId, equipmentId);
+
+        await connection.commit();
+
+        return {
+            oldPlanId: Number(planId),
+            newPlanId,
+            remainingQty: plan.remainingQty,
+            planDate: resumePlanDate,
+            dueDate: resumeDueDate,
+        };
+    } catch (err) {
+        await connection.rollback();
+        logger.error(`resumeHaltedPlan DB Query error\n: ${JSON.stringify(err)}`);
+        throw err;
+    } finally {
+        connection.release();
+    }
+};
 
 exports.getAvailableEquipment = async function (planId) {
     let connection;

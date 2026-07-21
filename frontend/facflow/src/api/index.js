@@ -19,9 +19,14 @@ export const createPlan = async (requestBody) => {
 
   // requestBody : "status"
 export const updatePlanStatus = async (planId, requestBody) => {
-    const { data } = await axiosInstance.patch(`/plan/${planId}/status`, requestBody);
+    const { data } = await axiosInstance.patch(`/plan/${planId}`, requestBody);
     return data.result;
-  };
+};
+
+export const resumeHaltedPlan = async (planId, requestBody) => {
+    const { data } = await axiosInstance.post(`/plan/${planId}/resume`, requestBody);
+    return data.result;
+};
 
   // requestBody : "equipmentId"
 export const startPlan = async (planId, requestBody) => {

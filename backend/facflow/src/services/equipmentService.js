@@ -2,6 +2,9 @@ const { pool } = require("../../config/database");
 const { logger } = require("../../config/winston");
 
 const equipmentDao = require("../dao/equipmentDao");
+const planDao = require("../dao/planDao");
+const productionDao = require("../dao/productionDao");
+const { generateHaltedProductionQty } = require("../utils/productionQtyGenerator");
 
 const EMPTY_EQUIPMENT_DETAIL = {
   productionQty: 0,
@@ -62,7 +65,6 @@ exports.getIdleEquipment = async function (productId) {
     }
 };
 
-// 생산중인 설비가 멈출 경우 이후 로직 구현 필요
 exports.updateEquipmentStatus = async function (equipmentId, status) {
   let connection;
 
@@ -74,9 +76,67 @@ exports.updateEquipmentStatus = async function (equipmentId, status) {
   }
 
   try {
-    const result = await equipmentDao.updateEquipmentStatus(connection, equipmentId, status);
-    return result;
+    const equipment = await equipmentDao.selectEquipmentById(connection, equipmentId);
+    if (!equipment) {
+      const err = new Error("EQUIPMENT_NOT_FOUND");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const previousStatus = equipment.status;
+    let haltedPlan = null;
+
+    if (status === "STOP" && previousStatus === "RUN") {
+      await connection.beginTransaction();
+
+      const running = await productionDao.selectRunningProductionByEquipmentId(
+        connection,
+        equipmentId
+      );
+
+      if (running) {
+        const { goodQty, defectQty, producedQty } = generateHaltedProductionQty(
+          running.targetQty
+        );
+
+        await productionDao.endProduction(
+          connection,
+          running.productionId,
+          goodQty,
+          defectQty
+        );
+        await planDao.updatePlanStatus(connection, running.planId, "HALT");
+
+        haltedPlan = {
+          planId: running.planId,
+          targetQty: running.targetQty,
+          producedQty,
+          goodQty,
+          defectQty,
+          remainingQty: Math.max(0, running.targetQty - producedQty),
+        };
+      }
+
+      await equipmentDao.updateEquipmentStatus(connection, equipmentId, status);
+      await connection.commit();
+    } else {
+      await equipmentDao.updateEquipmentStatus(connection, equipmentId, status);
+    }
+
+    return {
+      equipmentId: Number(equipmentId),
+      previousStatus,
+      status,
+      haltedPlan,
+    };
   } catch (err) {
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch (_) {
+        /* ignore rollback error */
+      }
+    }
     logger.error(`updateEquipmentStatus DB Query error\n: ${JSON.stringify(err)}`);
     throw err;
   }

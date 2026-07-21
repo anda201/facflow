@@ -1,10 +1,11 @@
-import { Clock, PlayCircle, CheckCircle2, Ban } from "lucide-react";
+import { Clock, PlayCircle, CheckCircle2, Ban, OctagonPause } from "lucide-react";
 import { COLORS } from "./colors";
 
 export const PLAN_STATUS_META = {
   WAIT: { label: "대기", color: COLORS.muted, icon: Clock },
   RUN: { label: "진행중", color: COLORS.amber, icon: PlayCircle },
   DONE: { label: "완료", color: COLORS.green, icon: CheckCircle2 },
+  HALT: { label: "중단", color: COLORS.red, icon: OctagonPause },
   CANCEL: { label: "취소", color: COLORS.red, icon: Ban },
 };
 
@@ -18,6 +19,7 @@ export const PLAN_STATUS_FILTERS = [
   { key: "ALL", label: "전체", color: COLORS.text },
   { key: "WAIT", label: "대기", color: COLORS.muted },
   { key: "RUN", label: "진행중", color: COLORS.amber },
+  { key: "HALT", label: "중단", color: COLORS.red },
   { key: "DONE", label: "완료", color: COLORS.green },
   { key: "CANCEL", label: "취소", color: COLORS.red },
 ];
@@ -25,10 +27,12 @@ export const PLAN_STATUS_FILTERS = [
 export const PRODUCTION_STATUS_META = {
   DONE: { label: "완료", color: COLORS.green, icon: CheckCircle2 },
   RUN: { label: "생산중", color: COLORS.amber, icon: PlayCircle },
+  HALT: { label: "중단", color: COLORS.red, icon: OctagonPause },
 };
 
 export const PRODUCTION_STATUS_FILTERS = [
   { key: "ALL", label: "전체", color: COLORS.text },
   { key: "RUN", label: "생산중", color: COLORS.amber },
+  { key: "HALT", label: "중단", color: COLORS.red },
   { key: "DONE", label: "완료", color: COLORS.green },
 ];

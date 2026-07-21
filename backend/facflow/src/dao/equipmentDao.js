@@ -46,6 +46,17 @@ exports.selectIdleEquipment = async function (connection, productId) {
   return rows;
 };
 
+exports.selectEquipmentById = async function (connection, equipmentId) {
+  const Query =
+    `SELECT equipmentId, equipmentName, status
+    FROM Equipment
+    WHERE equipmentId = ?;`;
+  const Params = [equipmentId];
+
+  const [rows] = await connection.query(Query, Params);
+  return rows[0];
+};
+
 exports.updateEquipmentStatus = async function (connection, equipmentId, status) {
   const Query = `UPDATE Equipment SET status = ? WHERE equipmentId = ?;`;
   const Params = [status, equipmentId];

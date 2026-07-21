@@ -35,13 +35,18 @@ exports.selectProductionList = async function (connection, productionDate) {
             p.endTime,
             p.goodQty,
             p.defectQty,
-            pp.status
+            pp.status,
+            pp.targetQty,
+            GREATEST(
+              pp.targetQty - IFNULL(p.goodQty, 0) - IFNULL(p.defectQty, 0),
+              0
+            ) AS remainingQty
         FROM Production p
         INNER JOIN ProductPlan pp ON p.planId = pp.planId
         INNER JOIN Product prod ON pp.productId = prod.productId
         INNER JOIN Equipment eq ON p.equipmentId = eq.equipmentId
         WHERE pp.planDate = ?
-        AND (pp.status = 'DONE' OR pp.status = 'RUN')
+        AND pp.status IN ('DONE', 'RUN', 'HALT')
         ORDER BY p.startTime DESC;`;
     const Params = [productionDate];
 
@@ -63,7 +68,12 @@ exports.selectOverdueProductionList = async function (connection) {
             p.endTime,
             p.goodQty,
             p.defectQty,
-            pp.status
+            pp.status,
+            pp.targetQty,
+            GREATEST(
+              pp.targetQty - IFNULL(p.goodQty, 0) - IFNULL(p.defectQty, 0),
+              0
+            ) AS remainingQty
         FROM Production p
         INNER JOIN ProductPlan pp ON p.planId = pp.planId
         INNER JOIN Product prod ON pp.productId = prod.productId
@@ -77,6 +87,25 @@ exports.selectOverdueProductionList = async function (connection) {
     return rows;
 };
 
+
+exports.selectRunningProductionByEquipmentId = async function (connection, equipmentId) {
+    const Query =
+        `SELECT
+            p.productionId,
+            p.planId,
+            pp.targetQty,
+            pp.status AS planStatus
+        FROM Production p
+        INNER JOIN ProductPlan pp ON p.planId = pp.planId
+        WHERE p.equipmentId = ?
+          AND pp.status = 'RUN'
+          AND p.endTime IS NULL
+        LIMIT 1;`;
+    const Params = [equipmentId];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows[0];
+};
 
 exports.selectProductionByPlanId = async function (connection, planId) {
     const Query =

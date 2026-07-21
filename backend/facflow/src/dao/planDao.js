@@ -11,7 +11,8 @@ exports.selectPlanSummary = async function (connection, planDate) {
         COUNT(CASE WHEN status = 'WAIT' THEN 1 END) AS waitPlans,
         COUNT(CASE WHEN status = 'RUN' THEN 1 END) AS runningPlans,
         COUNT(CASE WHEN status = 'DONE' THEN 1 END) AS completedPlans,
-        COUNT(CASE WHEN status = 'CANCEL' THEN 1 END) AS canceledPlans
+        COUNT(CASE WHEN status = 'CANCEL' THEN 1 END) AS canceledPlans,
+        COUNT(CASE WHEN status = 'HALT' THEN 1 END) AS haltedPlans
     FROM ProductPlan
     WHERE planDate = ?;`;
     const Params = [planDate];
@@ -28,11 +29,19 @@ exports.selectPlanList = async function (connection, planDate) {
             prod.productCode,
             prod.productName,
             pp.planDate,
+            pp.dueDate,
             pp.targetQty,
             pp.status,
-            pp.createdAt
+            pp.createdAt,
+            IFNULL(pr.goodQty, 0) AS goodQty,
+            IFNULL(pr.defectQty, 0) AS defectQty,
+            GREATEST(
+              pp.targetQty - IFNULL(pr.goodQty, 0) - IFNULL(pr.defectQty, 0),
+              0
+            ) AS remainingQty
         FROM ProductPlan pp
         INNER JOIN Product prod ON pp.productId = prod.productId
+        LEFT JOIN Production pr ON pr.planId = pp.planId
         WHERE pp.planDate = ?
         ORDER BY pp.createdAt DESC;`;
     const Params = [planDate];
@@ -52,15 +61,50 @@ exports.selectOverduePlanList = async function (connection) {
             pp.dueDate,
             pp.targetQty,
             pp.status,
-            pp.createdAt
+            pp.createdAt,
+            IFNULL(pr.goodQty, 0) AS goodQty,
+            IFNULL(pr.defectQty, 0) AS defectQty,
+            GREATEST(
+              pp.targetQty - IFNULL(pr.goodQty, 0) - IFNULL(pr.defectQty, 0),
+              0
+            ) AS remainingQty
         FROM ProductPlan pp
         INNER JOIN Product prod ON pp.productId = prod.productId
+        LEFT JOIN Production pr ON pr.planId = pp.planId
         WHERE pp.planDate < ?
           AND pp.status IN ('WAIT', 'RUN')
         ORDER BY pp.planDate ASC, pp.createdAt DESC;`;
     const Params = [today()];
 
     const [rows] = await connection.query(Query, Params);
+    return rows;
+};
+
+exports.selectHaltedPlanList = async function (connection) {
+    const Query =
+        `SELECT
+            pp.planId,
+            pp.productId,
+            prod.productCode,
+            prod.productName,
+            pp.planDate,
+            pp.dueDate,
+            pp.targetQty,
+            pp.status,
+            pp.createdAt,
+            IFNULL(pr.goodQty, 0) AS goodQty,
+            IFNULL(pr.defectQty, 0) AS defectQty,
+            GREATEST(
+              pp.targetQty - IFNULL(pr.goodQty, 0) - IFNULL(pr.defectQty, 0),
+              0
+            ) AS remainingQty
+        FROM ProductPlan pp
+        INNER JOIN Product prod ON pp.productId = prod.productId
+        LEFT JOIN Production pr ON pr.planId = pp.planId
+        WHERE pp.status = 'HALT'
+        ORDER BY pp.planDate ASC, pp.createdAt DESC;`;
+
+    const [rows] = await connection.query(Query);
     return rows;
 };
 
@@ -82,6 +126,34 @@ exports.updatePlanStatus = async function (connection, planId, status) {
 
     const [result] = await connection.query(Query, Params);
     return result;
+};
+
+exports.selectPlanById = async function (connection, planId) {
+    const Query =
+        `SELECT
+            pp.planId,
+            pp.productId,
+            prod.productCode,
+            prod.productName,
+            pp.planDate,
+            pp.dueDate,
+            pp.targetQty,
+            pp.status,
+            pp.createdAt,
+            IFNULL(pr.goodQty, 0) AS goodQty,
+            IFNULL(pr.defectQty, 0) AS defectQty,
+            GREATEST(
+              pp.targetQty - IFNULL(pr.goodQty, 0) - IFNULL(pr.defectQty, 0),
+              0
+            ) AS remainingQty
+        FROM ProductPlan pp
+        INNER JOIN Product prod ON pp.productId = prod.productId
+        LEFT JOIN Production pr ON pr.planId = pp.planId
+        WHERE pp.planId = ?;`;
+    const Params = [planId];
+
+    const [rows] = await connection.query(Query, Params);
+    return rows[0];
 };
 
 

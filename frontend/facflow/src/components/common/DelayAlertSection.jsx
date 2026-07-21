@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { COLORS } from "../../constants/colors";
 
-export default function DelayAlertSection({ severity, count, title, children }) {
+export default function DelayAlertSection({ severity, count, title, children, Icon = AlertTriangle }) {
   const color = severity === "critical" ? COLORS.red : COLORS.amber;
 
   return (
@@ -29,7 +29,7 @@ export default function DelayAlertSection({ severity, count, title, children }) 
           paddingLeft: 4,
         }}
       >
-        <AlertTriangle size={15} />
+        <Icon size={15} />
         {count}건의 {title}
       </div>
       {children}

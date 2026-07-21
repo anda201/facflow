@@ -20,3 +20,12 @@ exports.generateProductionQty = function (targetQty) {
 
   return { goodQty, defectQty };
 };
+
+
+exports.generateHaltedProductionQty = function (targetQty) {
+  const producedQty = Math.max(0, Math.round(Number(targetQty) * 0.2));
+  return {
+    producedQty,
+    ...exports.generateProductionQty(producedQty),
+  };
+};
