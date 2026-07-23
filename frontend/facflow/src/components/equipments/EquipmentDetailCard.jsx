@@ -51,6 +51,7 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
 
   return (
     <div
+      className="detail-overlay"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -59,7 +60,6 @@ function EquipmentDetailCard({ eq, onClose, onSetStop }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 50,
         padding: 20,
       }}
     >

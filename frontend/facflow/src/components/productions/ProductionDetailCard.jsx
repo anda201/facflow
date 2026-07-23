@@ -11,6 +11,7 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
 
   return (
     <div
+      className="detail-overlay"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -19,7 +20,6 @@ function ProductionDetailCard({ production, onClose, onComplete }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 50,
         padding: 20,
       }}
     >

@@ -22,6 +22,7 @@ function PlanDetailCard({
 
   return (
     <div
+      className="detail-overlay"
       onClick={onClose}
       style={{
         position: "fixed",
@@ -30,7 +31,6 @@ function PlanDetailCard({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 50,
         padding: 20,
       }}
     >
